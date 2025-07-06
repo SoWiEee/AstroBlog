@@ -75,9 +75,9 @@ export default defineConfig({
 				codeBackground: "var(--codeblock-bg)",
 				borderRadius: "0.75rem",
 				borderColor: "none",
-				codeFontSize: "0.875rem",
+				codeFontSize: "0.9rem",
 				codeFontFamily:
-					"'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+					"Menlo, 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Monaco, Consolas, monospace",
 				codeLineHeight: "1.5rem",
 				frames: {
 					editorBackground: "var(--codeblock-bg)",
