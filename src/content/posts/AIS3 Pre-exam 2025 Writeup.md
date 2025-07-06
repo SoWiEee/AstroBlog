@@ -11,35 +11,42 @@ lang: ''
 
 # Summary
 
-這是第二年打 pre-exam，拿到 71 名，比去年進步 30 幾名。
+這是第二年打 pre-exam，拿到 71 名，比去年進步 30 幾名。在逆向的部分有進步一點，並且能解出幾題密碼學
 
-![[螢幕擷取畫面 2025-05-26 170111.png]]
+[Source](../../assets/images/AIS3_2025/summary.png)
+
+---
 
 # Welcome
 * Tag：`Misc`
 
 1. 照打就拿到了
 
-![[螢幕擷取畫面 2025-06-03 153429.png]]
+[Source](../../assets/images/AIS3_2025/welcome.png)
+
+---
 
 # Login Screen 1
 
 * Tag：`Web` `Easy`
 
 1. 看原始碼
-![[螢幕擷取畫面 2025-05-26 223805.png]]
+
+[Source](../../assets/images/AIS3_2025/login1.png)
 
 2. 裡面創建一個 `users.db`，可以從 url 那邊下載，內容如下
 
-![[螢幕擷取畫面 2025-05-24 163920.png]]
+[Source](../../assets/images/AIS3_2025/login2.png)
 
 3. 顯然是用 bcrypt 加密，那用 john 破解看看
 
-![[螢幕擷取畫面 2025-05-24 163905.png]]
+[Source](../../assets/images/AIS3_2025/login3.png)
 
 4. 解出帳密 `admin:admin`，登入後輸入 2FA Code 就看到 flag 了
 
-![[螢幕擷取畫面 2025-05-24 163842.png]]
+[Source](../../assets/images/AIS3_2025/login4.png)
+
+---
 
 # Welcome to the World of Ave Mujica🌙
 
@@ -87,6 +94,8 @@ r.interactive()
 6. 來到 Ave Mujica 的世界就看到 flag 了
 
 ![[螢幕擷取畫面 2025-05-24 175604.png]]
+
+---
 
 # Stream
 
@@ -185,6 +194,8 @@ def main():
         print("[*] Recovered flag:", m.group(0).decode())printable.decode(errors="ignore"))
 ```
 
+---
+
 # Ramen CTF
 
 * Tag：`Misc`
@@ -197,6 +208,9 @@ def main():
 
 3. 從碗的外觀可以發現是**蝦拉麵**，但是店名不對
 4. 於是複製地址去查查看，是**樂山溫泉拉麵**
+
+---
+
 # web flag checker
 
 * Tag：`Misc` `Easy`
@@ -351,6 +365,7 @@ print(flag.decode())
 
 # AIS3{W4SM_R3v3rsing_w17h_g0_4pp_39229dd}
 ```
+---
 
 # Random_RSA
 
@@ -433,6 +448,8 @@ print(flag.decode())
 # AIS3{1_d0n7_r34lly_why_1_d1dn7_u53_637pr1m3}
 ```
 
+---
+
 # AIS3 Tiny Server - Misc | Web
 
 * Tag：`Misc` `Easy`
@@ -444,6 +461,8 @@ print(flag.decode())
 2. 然後就能讀 flag 了
 
 ![[螢幕擷取畫面 2025-05-25 112124.png]]
+
+---
 
 # AIS3 Tiny Server - Reverse
 
@@ -474,6 +493,8 @@ print(flag.decode())
 
 # AIS3{w0w_a_f1ag_check3r_1n_serv3r_1s_c00l!!!}
 ```
+
+---
 
 # SlowECDSA
 
@@ -537,6 +558,9 @@ io.interactive()
 4. 執行腳本拿 Flag
 
 ![[螢幕擷取畫面 2025-05-24 234424.png]]
+
+---
+
 # A_simple_snake_game
 
 * Tag：`Rev` `Baby`
@@ -545,11 +569,11 @@ io.interactive()
 2. 打開 IDA decompile 看看
 3. 猜測獲勝會顯示 flag，可以找找 Text 相關的函式，如 `SnakeGame::Screen::drawText()`
 
-![[螢幕擷取畫面 2025-05-25 115839.png]]
+[Source](../../assets/images/AIS3_2025/snake1.png)
 
 4. 感覺很像生出 flag 的邏輯，再搭配翻到的 `hex_array1`
 
-![[螢幕擷取畫面 2025-05-25 115801.png]]
+[Source](../../assets/images/AIS3_2025/snake2.png)
 
 5. 撰寫解密腳本
 ```python
