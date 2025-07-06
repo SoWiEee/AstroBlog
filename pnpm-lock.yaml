@@ -147,6 +147,9 @@ importers:
       '@biomejs/biome':
         specifier: 2.0.6
         version: 2.0.6
+      '@iconify-json/ic':
+        specifier: ^1.2.2
+        version: 1.2.2
       '@rollup/plugin-yaml':
         specifier: ^4.1.2
         version: 4.1.2(rollup@2.79.2)
@@ -1080,6 +1083,9 @@ packages:
 
   '@iconify-json/fa6-solid@1.2.3':
     resolution: {integrity: sha512-C5o8YJF+ekrS4wRb/6/0SE2KjRyJlCg++IOVC/fineiRinITivsmzFRNW1MQX2xfDZ1T7bxeKxLN6lcaTG3jGA==}
+
+  '@iconify-json/ic@1.2.2':
+    resolution: {integrity: sha512-QmjwS3lYiOmVWgTCEOTFyGODaR/+689+ajep/VsrCcsUN0Gdle5PmIcibDsdmRyrOsW/E77G41UUijdbjQUofw==}
 
   '@iconify-json/material-symbols@1.2.28':
     resolution: {integrity: sha512-yJsuEWZ9cDhQfg9qt4YQYhAqh6Pht0B23fGxr/jbMV12yJIft48Z/Qg5txqAXXsueDci2ZxAPqBPyKZIaEBq1w==}
@@ -6338,6 +6344,10 @@ snapshots:
       '@iconify/types': 2.0.0
 
   '@iconify-json/fa6-solid@1.2.3':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/ic@1.2.2':
     dependencies:
       '@iconify/types': 2.0.0
 
