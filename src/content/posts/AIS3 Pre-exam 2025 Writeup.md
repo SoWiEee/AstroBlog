@@ -54,18 +54,19 @@ lang: ''
 
 1. 先用 IDA 分析看看，有 BOF
 
-![[螢幕擷取畫面 2025-05-26 223432.png]]
+[Source](../../assets/images/AIS3_2025/mujica1.png)
 
 2. 檢查保護機制，感覺是一般的 buffer overflow
 
-![[螢幕擷取畫面 2025-05-26 223616.png]]
+[Source](../../assets/images/AIS3_2025/mujica2.png)
 
 3. 他會接收使用者提供的輸入，但回傳值是 unsigned，所以可以輸入 `-88` 這種數字來擴大 BOF 長度
 
-![[螢幕擷取畫面 2025-05-29 101336.png]]
+[Source](../../assets/images/AIS3_2025/mujica3.png)
+
 4. 用 pwndbg 測試，確定 payload 注入成功
 
-![[螢幕擷取畫面 2025-05-24 175207.png]]
+[Source](../../assets/images/AIS3_2025/mujica4.png)
 
 5. 執行遠端 exploit
 
@@ -93,7 +94,7 @@ r.interactive()
 
 6. 來到 Ave Mujica 的世界就看到 flag 了
 
-![[螢幕擷取畫面 2025-05-24 175604.png]]
+[Source](../../assets/images/AIS3_2025/mujica5.png)
 
 ---
 
@@ -204,7 +205,7 @@ def main():
 
 2. 題目說 flag 是 店家+品項，發現圖片裡有**發票條碼**能掃
 
-![[螢幕擷取畫面 2025-05-24 182527.png]]
+[Source](../../assets/images/AIS3_2025/ramen.png)
 
 3. 從碗的外觀可以發現是**蝦拉麵**，但是店名不對
 4. 於是複製地址去查查看，是**樂山溫泉拉麵**
@@ -218,7 +219,7 @@ def main():
 1. 這題就只給了輸入框，但亂輸入一些東西是沒反應
 2. F12 看看有 Web Assemaly `index.wasm`，拿去 [decompile](https://github.com/WebAssembly/wabt)
 
-![[螢幕擷取畫面 2025-05-29 102504.png]]
+[Source](../../assets/images/AIS3_2025/checker.png)
 
 3. 可以看到驗證邏輯
 
@@ -373,7 +374,7 @@ print(flag.decode())
 
 1. 檢查一下，可以發現參數太小
 
-![[螢幕擷取畫面 2025-05-29 102806.png]]
+[Source](../../assets/images/AIS3_2025/rsa.png)
 
 2. 撰寫解密腳本
 
@@ -456,11 +457,11 @@ print(flag.decode())
 
 1. 先把機器打開，[這篇文章](https://ctftime.org/writeup/22050)說可以用 `//` 跳出來，然後就看到根目錄
 
-![[螢幕擷取畫面 2025-05-25 112113.png]]
+[Source](../../assets/images/AIS3_2025/tiny1.png)
 
 2. 然後就能讀 flag 了
 
-![[螢幕擷取畫面 2025-05-25 112124.png]]
+[Source](../../assets/images/AIS3_2025/tiny2.png)
 
 ---
 
@@ -470,7 +471,7 @@ print(flag.decode())
   
 1. 先打開 IDA 看看，`sub_1E20` 感覺很可疑
 
-![[螢幕擷取畫面 2025-05-26 224445.png]]
+[Source](../../assets/images/AIS3_2025/tiny3.png)
 
 2. 撰寫解密腳本
 
@@ -557,7 +558,7 @@ io.interactive()
 
 4. 執行腳本拿 Flag
 
-![[螢幕擷取畫面 2025-05-24 234424.png]]
+[Source](../../assets/images/AIS3_2025/ecdsa.png)
 
 ---
 
