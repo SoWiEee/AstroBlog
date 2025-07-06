@@ -2,7 +2,7 @@
 title: AIS3 Pre-exam 2025 Writeup
 published: 2025-07-06
 description: ''
-image: ''
+image: 'ais3.png'
 tags: [CTF]
 category: 'Writeup'
 draft: false 
@@ -13,7 +13,7 @@ lang: ''
 
 這是第二年打 pre-exam，拿到 71 名，比去年進步 30 幾名。在逆向的部分有進步一點，並且能解出幾題密碼學
 
-[Source](../../assets/images/AIS3_2025/summary.png)
+![Source](../../assets/images/AIS3_2025/summary.png)
 
 ---
 
@@ -22,7 +22,7 @@ lang: ''
 
 1. 照打就拿到了
 
-[Source](../../assets/images/AIS3_2025/welcome.png)
+![Source](../../assets/images/AIS3_2025/welcome.png)
 
 ---
 
@@ -32,19 +32,19 @@ lang: ''
 
 1. 看原始碼
 
-[Source](../../assets/images/AIS3_2025/login1.png)
+![Source](../../assets/images/AIS3_2025/login1.png)
 
 2. 裡面創建一個 `users.db`，可以從 url 那邊下載，內容如下
 
-[Source](../../assets/images/AIS3_2025/login2.png)
+![Source](../../assets/images/AIS3_2025/login2.png)
 
 3. 顯然是用 bcrypt 加密，那用 john 破解看看
 
-[Source](../../assets/images/AIS3_2025/login3.png)
+![Source](../../assets/images/AIS3_2025/login3.png)
 
 4. 解出帳密 `admin:admin`，登入後輸入 2FA Code 就看到 flag 了
 
-[Source](../../assets/images/AIS3_2025/login4.png)
+![Source](../../assets/images/AIS3_2025/login4.png)
 
 ---
 
@@ -54,19 +54,19 @@ lang: ''
 
 1. 先用 IDA 分析看看，有 BOF
 
-[Source](../../assets/images/AIS3_2025/mujica1.png)
+![Source](../../assets/images/AIS3_2025/mujica1.png)
 
 2. 檢查保護機制，感覺是一般的 buffer overflow
 
-[Source](../../assets/images/AIS3_2025/mujica2.png)
+![Source](../../assets/images/AIS3_2025/mujica2.png)
 
 3. 他會接收使用者提供的輸入，但回傳值是 unsigned，所以可以輸入 `-88` 這種數字來擴大 BOF 長度
 
-[Source](../../assets/images/AIS3_2025/mujica3.png)
+![Source](../../assets/images/AIS3_2025/mujica3.png)
 
 4. 用 pwndbg 測試，確定 payload 注入成功
 
-[Source](../../assets/images/AIS3_2025/mujica4.png)
+![Source](../../assets/images/AIS3_2025/mujica4.png)
 
 5. 執行遠端 exploit
 
@@ -94,7 +94,7 @@ r.interactive()
 
 6. 來到 Ave Mujica 的世界就看到 flag 了
 
-[Source](../../assets/images/AIS3_2025/mujica5.png)
+![Source](../../assets/images/AIS3_2025/mujica5.png)
 
 ---
 
@@ -205,7 +205,7 @@ def main():
 
 2. 題目說 flag 是 店家+品項，發現圖片裡有**發票條碼**能掃
 
-[Source](../../assets/images/AIS3_2025/ramen.png)
+![Source](../../assets/images/AIS3_2025/ramen.png)
 
 3. 從碗的外觀可以發現是**蝦拉麵**，但是店名不對
 4. 於是複製地址去查查看，是**樂山溫泉拉麵**
@@ -219,7 +219,7 @@ def main():
 1. 這題就只給了輸入框，但亂輸入一些東西是沒反應
 2. F12 看看有 Web Assemaly `index.wasm`，拿去 [decompile](https://github.com/WebAssembly/wabt)
 
-[Source](../../assets/images/AIS3_2025/checker.png)
+![Source](../../assets/images/AIS3_2025/checker.png)
 
 3. 可以看到驗證邏輯
 
@@ -374,7 +374,7 @@ print(flag.decode())
 
 1. 檢查一下，可以發現參數太小
 
-[Source](../../assets/images/AIS3_2025/rsa.png)
+![Source](../../assets/images/AIS3_2025/rsa.png)
 
 2. 撰寫解密腳本
 
@@ -457,11 +457,11 @@ print(flag.decode())
 
 1. 先把機器打開，[這篇文章](https://ctftime.org/writeup/22050)說可以用 `//` 跳出來，然後就看到根目錄
 
-[Source](../../assets/images/AIS3_2025/tiny1.png)
+![Source](../../assets/images/AIS3_2025/tiny1.png)
 
 2. 然後就能讀 flag 了
 
-[Source](../../assets/images/AIS3_2025/tiny2.png)
+![Source](../../assets/images/AIS3_2025/tiny2.png)
 
 ---
 
@@ -471,7 +471,7 @@ print(flag.decode())
   
 1. 先打開 IDA 看看，`sub_1E20` 感覺很可疑
 
-[Source](../../assets/images/AIS3_2025/tiny3.png)
+![Source](../../assets/images/AIS3_2025/tiny3.png)
 
 2. 撰寫解密腳本
 
@@ -558,7 +558,7 @@ io.interactive()
 
 4. 執行腳本拿 Flag
 
-[Source](../../assets/images/AIS3_2025/ecdsa.png)
+![Source](../../assets/images/AIS3_2025/ecdsa.png)
 
 ---
 
@@ -570,11 +570,11 @@ io.interactive()
 2. 打開 IDA decompile 看看
 3. 猜測獲勝會顯示 flag，可以找找 Text 相關的函式，如 `SnakeGame::Screen::drawText()`
 
-[Source](../../assets/images/AIS3_2025/snake1.png)
+![Source](../../assets/images/AIS3_2025/snake1.png)
 
 4. 感覺很像生出 flag 的邏輯，再搭配翻到的 `hex_array1`
 
-[Source](../../assets/images/AIS3_2025/snake2.png)
+![Source](../../assets/images/AIS3_2025/snake2.png)
 
 5. 撰寫解密腳本
 ```python
