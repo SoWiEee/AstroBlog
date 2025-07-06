@@ -90,10 +90,17 @@
         }
     }
 
+    p {
+        @apply text-lg;
+        line-height: 1.5;
+    }
 
     ul, ol {
+        @apply text-lg;
+        line-height: 1.5;
         li::marker {
-            @apply text-[var(--primary)];
+            @apply text-[var(--primary)] ;
+            
         }
     }
 
