@@ -12,10 +12,6 @@ A static blog template built with [Astro](https://astro.build).
 
 🌏 README in
 [**中文**](https://github.com/saicaca/fuwari/blob/main/docs/README.zh-CN.md) /
-[**日本語**](https://github.com/saicaca/fuwari/blob/main/docs/README.ja.md) /
-[**한국어**](https://github.com/saicaca/fuwari/blob/main/docs/README.ko.md) /
-[**Español**](https://github.com/saicaca/fuwari/blob/main/docs/README.es.md) /
-[**ไทย**](https://github.com/saicaca/fuwari/blob/main/docs/README.th.md) (Provided by the community and may not always be up-to-date)
 
 ## ✨ Features
 
@@ -39,7 +35,6 @@ A static blog template built with [Astro](https://astro.build).
        yarn create fuwari
        pnpm create fuwari@latest
        bun create fuwari@latest
-       deno run -A npm:create-fuwari@latest
        ```
 2. To edit your blog locally, clone your repository, run `pnpm install` to install dependencies.
     - Install [pnpm](https://pnpm.io) `npm install -g pnpm` if you haven't.
@@ -86,9 +81,6 @@ All commands are run from the root of the project, from a terminal:
 | `pnpm astro ...`           | Run CLI commands like `astro add`, `astro check`    |
 | `pnpm astro --help`        | Get help using the Astro CLI                        |
 
-## ✏️ Contributing
-
-Check out the [Contributing Guide](https://github.com/saicaca/fuwari/blob/main/CONTRIBUTING.md) for details on how to contribute to this project.
 
 ## 📄 License
 
