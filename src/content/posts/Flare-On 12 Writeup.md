@@ -4,7 +4,7 @@ published: 2025-10-25
 description: ''
 image: ''
 tags: [CTF]
-category: 'InfoSec'
+category: 'Writeup'
 draft: false 
 lang: ''
 ---
