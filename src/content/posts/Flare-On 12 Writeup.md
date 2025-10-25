@@ -15,7 +15,7 @@ lang: ''
 
 總之先獻醜 (X
 
-![Source](../../assets/images/FlareOn12/flareon_rank.png)
+![Source](../../assets/images/FlareOn_12/flareon12_rank.png)
 
 # Challenge 1 -  Drill Baby Drill!
 
