@@ -5,7 +5,7 @@ description: ''
 image: ''
 tags: [CTF]
 category: 'Writeup'
-draft: false 
+draft: false
 lang: ''
 ---
 
@@ -54,7 +54,7 @@ BI /W 37/H 1/CS/G/BPC 8/L 458/F[
 /DCT
 ]ID
 ffd8ffe0...ffd9
-EI Q 
+EI Q
 
 q
 BT
@@ -121,7 +121,7 @@ print(flag)
     - 安全模式使用 RSA 加密
 5. 其中 LCG XOR 的詳細邏輯可以反編譯 contract_bytes
 ```solidity
-function NextVal(uint256 a, uint256 c, uint256 m, uint256 state, uint256 cnt) public payable { 
+function NextVal(uint256 a, uint256 c, uint256 m, uint256 state, uint256 cnt) public payable {
     if (cnt > 0) {
         v0 = v1 = 1;
     } else {
@@ -136,11 +136,11 @@ function NextVal(uint256 a, uint256 c, uint256 m, uint256 state, uint256 cnt) pu
 ```
 6. 當然也可以反編譯出 TripleXOR 的邏輯
 ```solidity
-function encrypt(uint256 prime_lcg, uint256 conv_time, bytes plaintext) public payable { 
+function encrypt(uint256 prime_lcg, uint256 conv_time, bytes plaintext) public payable {
     v0 = new bytes[](plaintext.length);
     CALLDATACOPY(v0.data, plaintext.data, plaintext.length);
     v0[plaintext.length] = 0;
-    v1 = v2 = MEM[v0.data]; 
+    v1 = v2 = MEM[v0.data];
     // 如果明文 <= 32 bytes
     if (v0.length <= 32) {
         v1 = v2 = MEM[v0.data]; // 將填充後的明文視為 uint256
@@ -252,4 +252,3 @@ FlareAuthenticator.exe
 * C2 交互設計、密碼學
 * 如何分析有混淆的程式
 * 靜態結合動態分析
-
