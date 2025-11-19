@@ -1,5 +1,5 @@
 ---
-title: Modern OpenGL Environment Build
+title: Modern OpenGL Beginner Guide
 published: 2025-11-17
 description: ''
 image: ''
@@ -165,3 +165,90 @@ int main() {
 由於電腦繪圖並非瞬間完成。如果直接在螢幕顯示的記憶體上繪圖，會造成閃爍或撕裂。因此建立一個 Front Buffer 用來儲存螢幕當前顯示的影像，另一個 Back Buffer 給 GPU 在幕後繪製。
 
 到這邊就完成 OpenGL 的起手式了！
+
+# 2. Draw Triangle
+
+在撰寫 OpenGL 程式的時候，要很清楚程式做了什麼，不然會造成難以追蹤的 bug。那要了解資料怎麼流動的話，最重要的就是渲染管線 (Graphics Pipeline)，它的主要工作就是把 3D 座標轉換為 2D 像素。
+
+在現代 OpenGL 中，我們可以自訂義 3 個著色器 (Shader)，並且至少要有頂點著色器 (Vertex Shader) 和片段著色器 (Fragment Shader) 才能讓程式正常運作。
+
+* 頂點著色器：處理單個頂點的屬性（位置、顏色、紋理座標）。它的主要工作是進行座標變換（將 3D 空間座標轉換為裁剪空間座標）
+* 片段著色器：計算最終像素的顏色。這是光照、陰影等進階效果發生的地方。
+
+注意在傳統教學網站 LearnOpenGL 上都是使用 3.3 版本的功能撰寫，而在 4.5 版本之後新增了 DSA (Direct State Access) 的功能，讓程式設計師更容易撰寫（但目前仍可以使用 3.3 版本的函數）。
+
+1. 定義三角形的頂點數據。這些座標位於標準化裝置座標 (NDC) 中，範圍是 [−1.0,1.0]。
+
+```cpp
+float vertices[] = {
+    -0.5f, -0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f,
+     0.0f,  0.5f, 0.0f
+};
+```
+
+2. 由於我們要請 GPU 繪製三角形，所以需要使用 VBO (Vertex Buffer Object) 來儲存這些數據然後傳給 GPU：
+
+```cpp
+unsigned int VBO;
+
+// create VBO buffer (memory)
+glCreateBuffers(1, &VBO);
+
+// allocate Immutable Storage
+glNamedBufferStorage(VBO, sizeof(vertices), vertices, GL_DYNAMIC_STORAGE_BIT);
+```
+
+VBO 是 GPU 顯存中的一塊記憶體區域，用來儲存頂點數據。
+由於我們保證不會調整該 VBO 的大小，所以 GPU Driver 可以對這塊記憶體進行更好的優化，像是存放在 VRAM 中存取速度最快的位置。
+
+3. 現在 VRAM 已經有頂點資料了，接著就是請頂點著色器處理這些資料，將輸入的 3D 座標轉換為 NDC：
+
+```cpp
+#version 450 core
+layout (location = 0) in vec3 aPos; // input, ID=0
+
+void main()
+{
+    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+}
+```
+
+4. Fragment Shader
+
+```cpp
+#version 450 core
+out vec4 FragColor; // output to Framebuffer
+
+void main()
+{
+    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f); // RGBA: 橘色
+}
+```
+
+5. 目前已經有 shader 的原始碼，我們需要動態編譯並連結這些 GLSL 字串
+
+```cpp
+// 為了簡潔，假設 shaderSource 是包含上述 GLSL 程式碼的 C-String
+
+// 1. 建立並編譯 Vertex Shader
+unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+glCompileShader(vertexShader);
+
+// 2. 建立並編譯 Fragment Shader
+unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+glCompileShader(fragmentShader);
+
+// 3. 連結成 Shader Program
+unsigned int shaderProgram = glCreateProgram();
+glAttachShader(shaderProgram, vertexShader);
+glAttachShader(shaderProgram, fragmentShader);
+glLinkProgram(shaderProgram);
+
+// 4. 清理
+glDeleteShader(vertexShader);
+glDeleteShader(fragmentShader);
+```
+
