@@ -77,7 +77,7 @@ include/
 
 2. 在 `main()` 裡面我們要先初始化 GLFW 並設定視窗提示，才能讓驅動程式知道我們要需要什麼樣的 GPU context。
 
-```
+```cpp
 int main() {
     glfwInit();
     // OpenGL 4.5
@@ -125,7 +125,8 @@ int main() {
     // 4.
     // define Normalized Device Coordinates
     glViewport(0, 0, 800, 600);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);  // 註冊 callback
+    // register callback
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     // 6.
 
 // resize callback
@@ -175,7 +176,9 @@ int main() {
 * 頂點著色器：處理單個頂點的屬性（位置、顏色、紋理座標）。它的主要工作是進行座標變換（將 3D 空間座標轉換為裁剪空間座標）
 * 片段著色器：計算最終像素的顏色。這是光照、陰影等進階效果發生的地方。
 
+:::note
 注意在傳統教學網站 LearnOpenGL 上都是使用 3.3 版本的功能撰寫，而在 4.5 版本之後新增了 DSA (Direct State Access) 的功能，讓程式設計師更容易撰寫（但目前仍可以使用 3.3 版本的函數）。
+:::
 
 1. 定義三角形的頂點數據。這些座標位於標準化裝置座標 (NDC) 中，範圍是 [−1.0,1.0]。
 
@@ -199,8 +202,11 @@ glCreateBuffers(1, &VBO);
 glNamedBufferStorage(VBO, sizeof(vertices), vertices, GL_DYNAMIC_STORAGE_BIT);
 ```
 
+:::note
 VBO 是 GPU 顯存中的一塊記憶體區域，用來儲存頂點數據。
+
 由於我們保證不會調整該 VBO 的大小，所以 GPU Driver 可以對這塊記憶體進行更好的優化，像是存放在 VRAM 中存取速度最快的位置。
+:::
 
 3. 現在 VRAM 已經有頂點資料了，接著就是請頂點著色器處理這些資料，將輸入的 3D 座標轉換為 NDC：
 
@@ -214,7 +220,7 @@ void main()
 }
 ```
 
-4. Fragment Shader
+4. 建立 Fragment Shader
 
 ```cpp
 #version 450 core
@@ -250,5 +256,52 @@ glLinkProgram(shaderProgram);
 // 4. 清理
 glDeleteShader(vertexShader);
 glDeleteShader(fragmentShader);
+```
+
+3. 目前有處理頂點的 shader 以及頂點資料，接著要讓頂點資料連接到對應的 shader 輸入，其中用到的物件是 VAO (Vertex Array Object)。
+
+```cpp
+unsigned int VAO;
+// create VAO
+glCreateVertexArrays(1, &VAO);
+```
+
+4. 接著透過綁定點 (Binding Point) 的概念連結。之前在 Shader 中指定了 layout (location = 0)。現在我們要告訴 VAO，位置 0 的數據格式是什麼，才能讓程式正確解析資料：
+
+```cpp
+// 啟用 location=0 的屬性
+glEnableVertexArrayAttrib(VAO, 0);
+
+// 設定格式：位置 0, 包含 3 個浮點數，相對起點偏移量 0
+glVertexArrayAttribFormat(VAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
+
+// 將屬性位置 0 關聯到綁定點 0
+glVertexArrayAttribBinding(VAO, 0, 0);
+```
+
+5. 將存有數據的 VBO 連接到綁定點 0：
+
+```cpp
+glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 3 * sizeof(float));
+```
+
+這種設計讓我們可以輕鬆切換數據來源。例如，如果我們有多個模型共享相同的頂點格式（都是 vec3 pos），我們只需要透過 glVertexArrayVertexBuffer 改變綁定點的來源 Buffer，而不需要重新設定繁瑣的 AttribFormat。
+
+6. 在 render loop 裡面繪製三角形：
+
+```cpp
+    while (!glfwWindowShouldClose(window))
+    {
+        // ...
+        // 1. use Shader Program
+        glUseProgram(shaderProgram);
+        // 2. 綁定 VAO
+        glBindVertexArray(VAO);
+        // 3. 繪製
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
 ```
 
