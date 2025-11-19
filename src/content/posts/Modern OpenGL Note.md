@@ -496,4 +496,171 @@ while (!glfwWindowShouldClose(window))
 }
 ```
 
+# 4. Texture Mapping
+
+紋理本質上是一個巨大的唯讀陣列。我們在 Shader 中透過採樣在 Fragment Shader 中讀取它，將其數據（顏色、粗糙度）映射到 3D 物件表面。
+
+## Texture Coordinates
+
+為了將 2D 圖片貼到 3D 三角形上，我們需要告訴 GPU 三角形的每個頂點對應圖片的哪個位置。這稱為 UV 映射。
+
+座標範圍：x 和 y 軸（在紋理中稱為 s 和 t）範圍皆為 [0,1]。
+
+原點 (0,0)：圖片的左下角。
+
+終點 (1,1)：圖片的右上角。
+
+我們需要在頂點數據中加入這些座標：
+
+```cpp
+float vertices[] = {
+    // 位置 (XYZ)        // 顏色 (RGB)       // 紋理座標 (UV)
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上 
+};
+```
+
+## 2. Texture Object
+
+不同於 3.3 版本，4.5 使用 Immutable Storage 的模式儲存紋理，首先會使用 `glTextureStorage2D()` 一次性宣告紋理的大小、格式和 Mipmap 層數，接著呼叫 `glTextureSubImage2D()` 將數據填入已分配的記憶體。
+
+1. 使用 stb_image.h 來載入紋理圖片，去[這裡](https://github.com/nothings/stb/blob/master/stb_image.h)下載然後放到專案根目錄即可
+
+
+注意 OpenGL 的 Y 軸 0 在底部，圖片通常在頂部，所以我們需要翻轉 Y 軸。
+
+```cpp
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+int main() {
+    // ...
+    // 1. 翻轉 Y 軸
+    stbi_set_flip_vertically_on_load(true);
+
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+    // ...
+}
+```
+
+2. 建立與分配
+
+```cpp
+int main() {
+    // ...
+    unsigned int texture;
+
+    // 1. 建立紋理物件 (Create)
+    glCreateTextures(GL_TEXTURE_2D, 1, &texture);
+
+    // 2. 設定環繞與過濾參數 (Parameters) - 直接操作物件，無需綁定
+    // S, T 軸設定為重複 (Repeat)
+    glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // 設定過濾器 (縮小使用 Mipmap 線性過濾，放大使用線性過濾)
+    glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    if (data)
+    {
+        // 3. 分配不可變存儲 (Allocate Immutable Storage)
+        // 參數: (ID, Mipmap層數, 內部格式, 寬, 高)
+        // 我們這裡簡單指定 1 層 Mipmap (如果不手動計算層數)，或根據尺寸計算
+        // 為了完整支援 Mipmap，我們需要計算層數，例如 floor(log2(max(w, h))) + 1
+        glTextureStorage2D(texture, 1, GL_RGB8, width, height); 
+
+        // 4. 上傳數據 (Upload Data)
+        // 參數: (ID, Level, xOffset, yOffset, 寬, 高, 來源格式, 來源型別, 數據指標)
+        glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+        // 5. 自動生成 Mipmap
+        glGenerateTextureMipmap(texture);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+
+    stbi_image_free(data);
+    // ...
+}
+```
+
+3. 目前頂點資料有 8 個 float 的 stride，接著啟用第 2 個屬性 (Location 2)：
+
+```cpp
+// 設定屬性 2 (Texture Coords)
+glEnableVertexArrayAttrib(VAO, 2);
+// 格式：2個 float, offset 為 6 * sizeof(float)
+glVertexArrayAttribFormat(VAO, 2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float)); 
+glVertexArrayAttribBinding(VAO, 2, 0); // 連結到 Binding Point 0
+```
+
+4. 設定 Shader 與 Texture Units
+
+在現代 OpenGL (4.2+) 中，我們不需要在 C++ 端使用 glUniform1i 來設定 Texture Unit。我們可以直接在 GLSL 中使用 binding 關鍵字。
+
+```cpp title="shader.vert"
+#version 450 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aColor;
+layout (location = 2) in vec2 aTexCoord; // add
+
+out vec3 ourColor;
+out vec2 TexCoord;
+
+void main()
+{
+    gl_Position = vec4(aPos, 1.0);
+    ourColor = aColor;
+    TexCoord = aTexCoord;
+}
+```
+
+```cpp title="shader.vert"
+#version 450 core
+out vec4 FragColor;
+
+in vec3 ourColor;
+in vec2 TexCoord;
+
+// 現代 GLSL：直接指定綁定點 (Binding Point)
+// 這對應到 C++ 中的 Texture Unit
+layout(binding = 0) uniform sampler2D texture1;
+layout(binding = 1) uniform sampler2D texture2; 
+
+void main()
+{
+    // mix texture
+    vec4 col1 = texture(texture1, TexCoord);
+    vec4 col2 = texture(texture2, TexCoord);
+    
+    // 混合 80% col1 和 20% col2
+    FragColor = mix(col1, col2, 0.2);
+}
+```
+
+5. 在 Render Loop 中呼叫 `glBindTextureUnit()`，將這個紋理物件插到這個紋理單元插槽上。
+
+```cpp
+while (!glfwWindowShouldClose(window))
+{
+    // ...
+
+    ourShader.use();
+
+    // 綁定紋理到單元 (Binding Units)
+    // 這些索引對應到 Shader 中的 layout(binding = X)
+    glBindTextureUnit(0, texture1); // 將 texture1 綁定到 Unit 0
+    glBindTextureUnit(1, texture2); // 將 texture2 綁定到 Unit 1
+
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    // ... (Swap Buffers) ...
+}
+```
 
