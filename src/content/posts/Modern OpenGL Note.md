@@ -1,5 +1,5 @@
 ---
-title: Modern OpenGL Note
+title: Modern OpenGL Environment Build
 published: 2025-11-17
 description: ''
 image: ''
@@ -16,8 +16,7 @@ lang: ''
 * 通常在學校的計算機圖學課程會使用這個東西來實作程式
 * 本身是由 Khronos 組織制定及維護的規範，是一個 spec
 * 早期是立即渲染模式，但是效率太低，從 3.2 之後鼓勵開發者在 Core-profile 下進行開發
-* 在早期的 OpenGL 4.2 以前，存在全域狀態和職責分離不佳的問題，這使得編寫無 bug 的程式碼更加困難。
-* 由於全域狀態的存在，早期 OpenGL 程式碼的正確性難以審核，迫使程式設計師不斷考慮 API 指令模糊不清的作用域
+* 由於全域狀態的存在，早期 OpenGL 程式碼的正確性難以審核，迫使程式設計師不斷考慮 API 指令模糊不清的 scope
 * 在 OpenGL 4.5 之後解決或緩解了許多此類問題
 
 # Environment Setup
@@ -48,17 +47,21 @@ include/
 - Linker＞其他函數庫目錄＞加入 `glfw\lib-vc2022`
 - Linker＞輸入＞加入 `glfw3.lib`、`opengl32.lib`
 
-5. 這樣就完成基本的環境建置了
+5. 這樣就完成基本的環境建置了，執行起來後應該會動 XD
 
 # Debug/Profiling Tool
+
+以前寫 C/C++ 的時候有 gcc, perf 可以用，對於圖學程式也是有相應的工具。
 
 ## RenderDoc
 
 * [網站在這](https://renderdoc.org/)
+* [使用說明](https://renderdoc.org/docs/getting_started/quick_start.html)
 
 
 ## Nvidia Nsight Graphic
 
-
+* N 卡專用的 debugger, profiler
+* [使用說明](https://docs.nvidia.com/nsight-graphics/UserGuide/index.html)
 
 
