@@ -65,3 +65,103 @@ include/
 * [使用說明](https://docs.nvidia.com/nsight-graphics/UserGuide/index.html)
 
 
+# 1. Create Window
+
+1. 建立一個 `.cpp` 檔案，並引用以下 header（注意順序）：
+
+```cpp
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <iostream>
+```
+
+2. 在 `main()` 裡面我們要先初始化 GLFW 並設定視窗提示，才能讓驅動程式知道我們要需要什麼樣的 GPU context。
+
+```
+int main() {
+    glfwInit();
+    // OpenGL 4.5
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+    // 使用 Core Profile 開發
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);    // for MacOS
+#endif
+
+    // 3.
+}
+```
+
+3. 接下來請求作業系統分配視窗資源
+
+```cpp
+    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnModernOpenGL", NULL, NULL);
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+    glfwMakeContextCurrent(window);     // window context <- thread context
+    // 4.
+```
+
+4. 載入 OpenGL 函式指標 (GLAD)。由於 OpenGL 的驅動程式實作是由顯示卡廠商（NVIDIA, AMD, Intel）提供的，函式的記憶體位址在編譯時是未知的，必須在執行期間動態查詢。
+
+```cpp
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+    // 5.
+```
+
+5. 接著需要告訴 OpenGL 渲染視窗的維度，並且使用者調整視窗大小時，viewport 也要隨著更新
+
+```cpp
+    // 4.
+    // define Normalized Device Coordinates
+    glViewport(0, 0, 800, 600);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);  // 註冊 callback
+    // 6.
+
+// resize callback
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+```
+
+OpenGL 的座標系統通常在 −1.0 到 1.0 之間。glViewport 負責將這些資料進行 Viewport Transform。例如，處理後的座標 (−0.5,0.5) 會被映射到螢幕上的 (200,450)。
+
+6. 我們不希望程式畫完一張圖就結束，因此需要一個 render loop，在螢幕刷新時都會重新跑一次：
+
+```cpp
+int main() {
+    // ...
+    while(!glfwWindowShouldClose(window))
+    {
+        // 1. 處理輸入
+        processInput(window);
+
+        // 2. 渲染指令
+        // clear color
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // 3. 交換緩衝區與輪詢事件
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glfwTerminate();
+    return 0;
+}
+```
+
+由於電腦繪圖並非瞬間完成。如果直接在螢幕顯示的記憶體上繪圖，會造成閃爍或撕裂。因此建立一個 Front Buffer 用來儲存螢幕當前顯示的影像，另一個 Back Buffer 給 GPU 在幕後繪製。
+
+到這邊就完成 OpenGL 的起手式了！
