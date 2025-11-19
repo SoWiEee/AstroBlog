@@ -33,7 +33,7 @@ lang: ''
 
 在 `main.a()` 是接受 ChaCha20 解密資料產生的 SHA256 hash，接著和 xor_key_FlareOn2024( FlareOn2024），然後進行 base64 編碼之後比對是否吻合。
 
-```golang
+```txt
 v20 = checksum_xored_array;
 checksum_xored_base64 = encoding_base64__ptr_Encoding_EncodeToString(
                         runtime_bss,
