@@ -305,3 +305,195 @@ glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 3 * sizeof(float));
     }
 ```
 
+# 3. Shader Advanced
+
+在上一章我們提到，Shader 是運行在 GPU 上的微型程式。從計算機科學的角度來看，GPU 是大規模平行處理器 (SIMD架構)，而 Shader 就是這些核心上執行的核心邏輯 (Kernel)。它們是高度隔離的——Shader 之間無法直接通訊，唯一的溝通橋樑是 輸入 (Input) 與 輸出 (Output) 變數。
+
+我們使用 GLSL (OpenGL Shading Language) 來撰寫 Shader。它是一種強型別的 C-style 語言，專門為了向量與矩陣運算而生。
+
+## Data Types
+
+* 基礎型別 (int, float, bool)
+* 容器型別 (vec2, vec3, vec4, mat4)
+* 重組 (Swizzling) 是 GLSL 最強大的特性之一。由於圖形運算大量依賴向量，我們可以隨意組合分量
+
+```cpp
+vec3 someVec = vec3(1.0, 2.0, 3.0);
+vec4 differentVec = someVec.xyxx; // (1.0, 2.0, 1.0, 1.0)
+vec3 anotherVec = differentVec.zyw; // (1.0, 2.0, 1.0)
+```
+
+## Uniforms
+
+Uniforms 是 CPU 向 GPU 傳送數據的方式。它們是**全域**的 (Global per Shader Program)，且在被更新前會一直保持數值。我們可以使用 `glProgramUniformxx` 系列函式，直接指定 Program ID，不需要綁定 Shader 即可更新數值。
+
+1. 修改 fragment shader 讓頂點顏色隨時間變化：
+
+```cpp
+#version 450 core
+out vec4 FragColor;
+uniform vec4 ourColor; // from CPU
+
+void main() {
+    FragColor = ourColor;
+}
+```
+
+2. 調整 Render Loop：
+
+```cpp
+// 獲取 Uniform 的位置 (Location)
+int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+
+// Render loop
+while (!glfwWindowShouldClose(window))
+{
+    float timeValue = glfwGetTime();
+    float greenValue = sin(timeValue) / 2.0f + 0.5f;
+    // update Uniform
+    glProgramUniform4f(shaderProgram, vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+}
+```
+
+## More Attributes
+
+如果我們希望每個頂點都有自己的顏色，我們需要擴充頂點資料並更新 VBO。
+
+1. 將位置和顏色交錯排列在同一個陣列中。這有助於 Cache Locality：
+
+```cpp
+float vertices[] = {
+    // 位置 (XYZ)        // 顏色 (RGB)
+     0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // 右下
+    -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // 左下
+     0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // 頂部
+};
+```
+
+2. 告訴 OpenGL 如何解讀這個 Buffer，我們現在有 2 個屬性：
+
+* Location 0: Position (offset 0)
+* Location 1: Color (offset 12 bytes)
+
+```cpp
+unsigned int VAO;
+glCreateVertexArrays(1, &VAO);
+
+// 1. 連結 VBO 到綁定點 0 (Binding Point 0)
+// stride = 6 * float
+glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 6 * sizeof(float));
+
+// 2. 設定 Position 屬性 (Location 0)
+glEnableVertexArrayAttrib(VAO, 0);
+glVertexArrayAttribFormat(VAO, 0, 3, GL_FLOAT, GL_FALSE, 0); // offset=0
+glVertexArrayAttribBinding(VAO, 0, 0); // 連結到 Binding Point 0
+
+// 3. 設定 Color 屬性 (Location 1)
+glEnableVertexArrayAttrib(VAO, 1);
+glVertexArrayAttribFormat(VAO, 1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float)); // offset=12
+glVertexArrayAttribBinding(VAO, 1, 0); // 連結到 Binding Point 0
+```
+
+當你傳遞顏色給 Vertex Shader，再傳給 Fragment Shader 時，你會看到三角形中間呈現漸層色。這是因為 光柵化 (Rasterization) 階段發生了 片段插值 (Fragment Interpolation)。
+
+GPU 會計算目前像素相對於三角形三個頂點的重心座標，並根據權重混合顏色。例如，若像素剛好在綠色和藍色頂點的中間，它的顏色就是 50% 綠 + 50% 藍。
+
+## Shader Class
+
+為了保持程式碼整潔，我們將讀取檔案、編譯、連結以及 Uniform 設定封裝成一個 C++ 類別。
+
+```cpp title="Shader.h"
+#ifndef SHADER_H
+#define SHADER_H
+
+#include <glad/glad.h>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+class Shader
+{
+public:
+    unsigned int ID; // Program ID
+
+    Shader(const char* vertexPath, const char* fragmentPath);
+    void use();
+    void setBool(const std::string &name, bool value) const;
+    void setInt(const std::string &name, int value) const;
+    void setFloat(const std::string &name, float value) const;
+    void setVec4(const std::string &name, float x, float y, float z, float w) const;
+
+private:
+    void checkCompileErrors(unsigned int shader, std::string type);
+};
+#endif
+```
+
+```cpp title="Shader.cpp"
+Shader::Shader(const char* vertexPath, const char* fragmentPath)
+{
+    // ... (讀取檔案內容至 vShaderCode, fShaderCode 字串，同原文) ...
+
+    unsigned int vertex, fragment;
+    
+    // 建立與編譯 Vertex Shader
+    vertex = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex, 1, &vShaderCode, NULL);
+    glCompileShader(vertex);
+    checkCompileErrors(vertex, "VERTEX");
+
+    // 建立與編譯 Fragment Shader
+    fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment, 1, &fShaderCode, NULL);
+    glCompileShader(fragment);
+    checkCompileErrors(fragment, "FRAGMENT");
+
+    // 連結 Shader Program
+    ID = glCreateProgram();
+    glAttachShader(ID, vertex);
+    glAttachShader(ID, fragment);
+    glLinkProgram(ID);
+    checkCompileErrors(ID, "PROGRAM");
+
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
+}
+
+void Shader::use()
+{
+    glUseProgram(ID);
+}
+
+void Shader::setFloat(const std::string &name, float value) const
+{
+    glProgramUniform1f(ID, glGetUniformLocation(ID, name.c_str()), value);
+}
+
+void Shader::setVec4(const std::string &name, float x, float y, float z, float w) const
+{
+    glProgramUniform4f(ID, glGetUniformLocation(ID, name.c_str()), x, y, z, w);
+}
+```
+
+```cpp title="main.cpp"
+Shader ourShader("shader.vs", "shader.fs");
+
+// Render Loop
+while (!glfwWindowShouldClose(window))
+{
+    // 更新 Uniform
+    float timeValue = glfwGetTime();
+    float greenValue = sin(timeValue) / 2.0f + 0.5f;
+    ourShader.setVec4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
+
+    // 渲染
+    ourShader.use();
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    
+    // ...
+}
+```
+
+
