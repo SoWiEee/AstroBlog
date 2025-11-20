@@ -208,7 +208,7 @@ VBO 是 GPU 顯存中的一塊記憶體區域，用來儲存頂點數據。
 
 3. 現在 VRAM 已經有頂點資料了，接著就是請頂點著色器處理這些資料，將輸入的 3D 座標轉換為 NDC：
 
-```cpp
+```glsl
 #version 450 core
 layout (location = 0) in vec3 aPos; // input, ID=0
 
@@ -220,7 +220,7 @@ void main()
 
 4. 建立 Fragment Shader
 
-```cpp
+```glsl
 #version 450 core
 out vec4 FragColor; // output to Framebuffer
 
@@ -678,5 +678,162 @@ while (!glfwWindowShouldClose(window))
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     // ... (Swap Buffers) ...
+}
+```
+
+# 5. Coordinate Systems
+
+從系統層面來看，Vertex Shader 的最終目標是輸出標準化裝置座標 (Normalized Device Coordinates, NDC)。這是一個 x,y,z 軸範圍皆為 [−1.0,1.0] 的空間。任何落在這個範圍之外的座標都會被 GPU 的 Clipping 階段剔除。
+
+為了將任意 3D 場景映射到這個 NDC 空間，我們通常會經過 5 個不同的座標系統。理解這些空間變換是 3D 圖形程式設計的核心。變換流程通常涉及三個關鍵矩陣：Model (模型)、View (視圖)、Projection (投影)，合稱 MVP 矩陣。
+
+1. Local Space：物體自身的座標系（例如建模軟體中的原點）
+2. World Space：所有物體放置在同一個全域場景中的座標系
+3. View Space：以「攝影為原點的座標系
+4. Clip Space：經過投影變換後的空間，準備進行裁剪
+5. Screen Space：最終映射到視窗像素的 2D 座標
+
+一個頂點 $V_{local}$​ 經過變換成為裁剪座標 $V_{clip}$​ 的公式為：
+
+$$
+V_{clip}​ = M_{projection​} \dot M_{view​} \dot M_{model}​ \dot V_{local}​
+$$
+
+## Local Space
+
+這是物件的「原生」狀態。例如你在 Blender 裡建立一個立方體，它的中心通常是 (0,0,0)。無論你後來把這個立方體放到遊戲世界的哪裡，它內部的頂點座標永遠相對於它的中心不變。
+
+## World Space
+
+為了將多個物件放入同一個場景，我們使用 Model Matrix。這個矩陣包含平移、旋轉和縮放。它將頂點從局部原點移動到世界中的特定位置。
+
+## View/Camera Space
+
+OpenGL 本身並沒有「攝影機」的概念。所謂的攝影機，其實是透過逆向操作來實現的。如果你想將攝影機向後移動（+z 方向），這在數學上等同於將整個世界向前移動（−z 方向）。 View Matrix 的任務就是將世界座標系變換到以攝影機為原點、攝影機視線為 −z 軸的座標系中。
+
+## Clip Space
+
+這是最抽象的一步。Vertex Shader 輸出的 `gl_Position` 就在這裡。OpenGL 預期所有可見頂點落在 [−1.0,1.0] 的範圍內。 將 View Space (例如 [−1000,1000]) 壓縮到 NDC 的過程稱為投影。我們主要使用兩種投影方式：
+
+- 正交投影 (Orthographic)：定義一個立方體的視錐體 (frustum)。物體不會因為距離而變小。常用於 2D 渲染或工程製圖。
+
+- 透視投影 (Perspective)：模擬人眼或相機，遠處的物體看起來較小。這是透過操作齊次座標中的 $w$ 分量來實現的。離觀察者越遠，$w$ 分量越大。在 Vertex Shader 結束後，GPU 會自動執行透視除法：$V_{NDC} ​= ​x/wy/wz/w​​$
+
+可以使用先前安裝好的 GLM 來建立透視矩陣：
+
+```cpp
+// FOV: 45度, 長寬比: 800/600, 近平面: 0.1, 遠平面: 100.0
+glm::mat4 proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+```
+
+## Hands On
+
+1. 我們要繪製一個 3D 立方體。
+
+```cpp title="shader.vert"
+#version 450 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec2 aTexCoord;
+
+out vec2 TexCoord;
+
+layout (location = 0) uniform mat4 model;
+layout (location = 1) uniform mat4 view;
+layout (location = 2) uniform mat4 projection;
+
+void main()
+{
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    TexCoord = aTexCoord;
+}
+```
+
+2. 使用 DSA 的 glProgramUniformMatrix4fv，我們可以不需綁定 (Bind) Shader Program 就能更新它的 Uniform。
+
+```cpp
+// Render Loop
+while (!glfwWindowShouldClose(window))
+{
+// ... Input & Clear ...
+
+    // 1. Model Matrix: 讓立方體隨時間旋轉
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+
+    // 2. View Matrix: 將場景向後移，模擬攝影機向後退
+    glm::mat4 view = glm::mat4(1.0f);
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+    // 3. Projection Matrix
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+    // 4. 傳送矩陣到 Shader
+    glProgramUniformMatrix4fv(shaderProgram.ID, 0, 1, GL_FALSE, glm::value_ptr(model));
+    glProgramUniformMatrix4fv(shaderProgram.ID, 1, 1, GL_FALSE, glm::value_ptr(view));
+    glProgramUniformMatrix4fv(shaderProgram.ID, 2, 1, GL_FALSE, glm::value_ptr(projection));
+
+    // 5. 繪製
+    shaderProgram.use();
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36); // 繪製 36 個頂點 (立方體)
+
+    // ... Swap Buffers ...
+}
+```
+
+3. 如果直接繪製立方體，可以發現遠處的面可能會蓋住近處的面，這是因為 OpenGL 預設是按照繪製順序覆蓋像素。要根據深度來避免這種問題，我們需要使用 Z-Buffer。
+
+這是一個與螢幕解析度相同的緩衝區，儲存每個像素的深度(z)。 當 GPU 想要繪製一個像素時，它會檢查 Z-Buffer：
+
+- 如果新像素的 z 值小於緩衝區中的值（更靠近攝影機），則繪製並更新 Z-Buffer
+- 否則，丟棄該像素
+
+```cpp
+// 在初始化階段啟用
+glEnable(GL_DEPTH_TEST);
+
+glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // update
+```
+
+4. 繪製更多立方體
+
+假設我們要畫 10 個位置不同的立方體。我們不需要建立 10 個 VBO。既然立方體長得一樣，我們只需要重複使用同一個 VAO，但每次繪製時傳送不同的 Model Matrix 即可。
+
+:::note
+這裡我們使用迴圈呼叫 10 次 `glDrawArrays`。對於極大量的物體（如數千個），這會造成 CPU-GPU 通訊瓶頸 (Draw Call Overhead)。之後會使用 Instanced Rendering 來一次性繪製它們。
+:::
+
+```cpp
+// 定義 10 個位移向量
+glm::vec3 cubePositions[] = {
+    glm::vec3( 0.0f, 0.0f, 0.0f),
+    glm::vec3( 2.0f, 5.0f, -15.0f),
+    // ... (其餘 8 個位置)
+    glm::vec3(-1.3f, 1.0f, -1.5f)
+};
+
+// Render Loop
+while (!glfwWindowShouldClose(window))
+{
+    // ...
+    shaderProgram.use();
+    glBindVertexArray(VAO);
+
+    for(unsigned int i = 0; i < 10; i++)
+    {
+    // 計算每個立方體獨特的 Model Matrix
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, cubePositions[i]);
+    float angle = 20.0f _ i;
+    if(i % 3 == 0) // 讓部分立方體隨時間旋轉
+    angle = glfwGetTime() _ 25.0f;
+    model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+
+        // updtae Model (Location 0)
+        glProgramUniformMatrix4fv(shaderProgram.ID, 0, 1, GL_FALSE, glm::value_ptr(model));
+        // draw
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+    // ...
 }
 ```
