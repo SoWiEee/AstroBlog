@@ -35,7 +35,7 @@ include/
 │   └── src/
 ├── glfw/
 │   ├── include/
-│   └── lib-vcc2022/
+│   └── lib-vc2022/
 └── glm
     └── glm/
 ```
@@ -394,7 +394,7 @@ glVertexArrayAttribFormat(VAO, 1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float)); // 
 glVertexArrayAttribBinding(VAO, 1, 0); // 連結到 Binding Point 0
 ```
 
-當你傳遞顏色給 Vertex Shader，再傳給 Fragment Shader 時，你會看到三角形中間呈現漸層色。這是因為 光柵化 (Rasterization) 階段發生了 片段插值 (Fragment Interpolation)。
+當你傳遞顏色給 Vertex Shader，再傳給 Fragment Shader 時，你會看到三角形中間呈現漸層色。這是因為光柵化 (Rasterization) 階段發生了片段插值。
 
 GPU 會計算目前像素相對於三角形三個頂點的重心座標，並根據權重混合顏色。例如，若像素剛好在綠色和藍色頂點的中間，它的顏色就是 50% 綠 + 50% 藍。
 
@@ -477,7 +477,7 @@ void Shader::setVec4(const std::string &name, float x, float y, float z, float w
 ```
 
 ```cpp title="main.cpp"
-Shader ourShader("shader.vs", "shader.fs");
+Shader ourShader("shader.vert", "shader.frag");
 
 // Render Loop
 while (!glfwWindowShouldClose(window))
@@ -502,13 +502,9 @@ while (!glfwWindowShouldClose(window))
 
 ## Texture Coordinates
 
-為了將 2D 圖片貼到 3D 三角形上，我們需要告訴 GPU 三角形的每個頂點對應圖片的哪個位置。這稱為 UV 映射。
+為了將 2D 圖片貼到 3D 三角形上，我們需要告訴 GPU 三角形的每個頂點(xy)對應圖片的哪個位置(uv)。
 
-座標範圍：x 和 y 軸（在紋理中稱為 s 和 t）範圍皆為 [0,1]。
-
-原點 (0,0)：圖片的左下角。
-
-終點 (1,1)：圖片的右上角。
+原點 (0,0) 代表圖片的左下角，終點 (1,1) 代表圖片的右上角。
 
 我們需要在頂點數據中加入這些座標：
 
@@ -526,7 +522,7 @@ float vertices[] = {
 
 不同於 3.3 版本，4.5 使用 Immutable Storage 的模式儲存紋理，首先會使用 `glTextureStorage2D()` 一次性宣告紋理的大小、格式和 Mipmap 層數，接著呼叫 `glTextureSubImage2D()` 將數據填入已分配的記憶體。
 
-1. 使用 stb_image.h 來載入紋理圖片，去[這裡](https://github.com/nothings/stb/blob/master/stb_image.h)下載然後放到專案根目錄即可
+1. 使用 `stb_image.h` 來載入紋理圖片，去[這裡](https://github.com/nothings/stb/blob/master/stb_image.h)下載然後放到專案根目錄即可
 
 
 注意 OpenGL 的 Y 軸 0 在底部，圖片通常在頂部，所以我們需要翻轉 Y 軸。
@@ -537,7 +533,7 @@ float vertices[] = {
 
 int main() {
     // ...
-    // 1. 翻轉 Y 軸
+    // 翻轉 Y 軸，讓圖片原點對齊 OpenGL 的左下角
     stbi_set_flip_vertically_on_load(true);
 
     int width, height, nrChannels;
@@ -546,37 +542,53 @@ int main() {
 }
 ```
 
-2. 建立與分配
+2. 載入與建立紋理
+
+紋理座標的範圍通常在 (0,0) 到 (1,1) 之間。但如果我們指定的座標超出了這個範圍會發生什麼？OpenGL 提供了多種 環繞模式 (Wrapping Modes) 來決定採樣行為：
+
+* `GL_REPEAT`：預設行為。重複紋理圖像（忽略座標的整數部分）。
+* `GL_MIRRORED_REPEAT`：類似重複，但在每次重複時鏡像翻轉圖片。
+* `GL_CLAMP_TO_EDGE`：座標被限制在 0 到 1 之間。超出的部分會重複邊緣的像素，產生拉伸效果。
+* `GL_CLAMP_TO_BORDER`：超出範圍的座標會被填入使用者指定的邊緣顏色。
+
+紋理座標是浮點數，可以在任意位置採樣，但紋理圖片是由離散的像素（Texels）組成。OpenGL 需要計算出一個浮點座標到底對應什麼顏色，這就是紋理過濾。主要有兩種情況：
+
+* Magnification (放大)：當紋理很小，但貼在很大的物體上時。
+* Minification (縮小)：當紋理很大，但物體在畫面上很遠很小時。
+* `GL_NEAREST` (鄰近採樣)：選擇中心點最接近紋理座標的那個 Texel。這會產生顆粒感，適合像素風格遊戲。
+* `GL_LINEAR` (線性採樣)：獲取座標附近的 Texels 進行雙線性插值。這會產生較平滑模糊的效果。
 
 ```cpp
 int main() {
     // ...
     unsigned int texture;
 
-    // 1. 建立紋理物件 (Create)
+    // create texture
     glCreateTextures(GL_TEXTURE_2D, 1, &texture);
 
-    // 2. 設定環繞與過濾參數 (Parameters) - 直接操作物件，無需綁定
-    // S, T 軸設定為重複 (Repeat)
+    // set warp
+    // U, V 軸設定為 Repeat
     glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // 設定過濾器 (縮小使用 Mipmap 線性過濾，放大使用線性過濾)
+    // set filter
+    // 縮小時使用 Mipmap Linear
     glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    // 放大時使用 Linear
     glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     if (data)
     {
-        // 3. 分配不可變存儲 (Allocate Immutable Storage)
-        // 參數: (ID, Mipmap層數, 內部格式, 寬, 高)
-        // 我們這裡簡單指定 1 層 Mipmap (如果不手動計算層數)，或根據尺寸計算
-        // 為了完整支援 Mipmap，我們需要計算層數，例如 floor(log2(max(w, h))) + 1
-        glTextureStorage2D(texture, 1, GL_RGB8, width, height); 
+        // Mipmap level
+        int levels = 1 + floor(log2(std::max(width, height)));
 
-        // 4. 上傳數據 (Upload Data)
+        // 分配固定記憶體
+        glTextureStorage2D(texture, levels, GL_RGB8, width, height);
+
+        // Upload Data
         // 參數: (ID, Level, xOffset, yOffset, 寬, 高, 來源格式, 來源型別, 數據指標)
         glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
 
-        // 5. 自動生成 Mipmap
+        // 自動生成 Mipmap
         glGenerateTextureMipmap(texture);
     }
     else
@@ -589,6 +601,16 @@ int main() {
 }
 ```
 
+:::note Mipmaps
+
+想像一個擁有數千個物體的場景。遠處的物體可能在螢幕上只佔幾個像素，但它卻貼著一張高解析度 (1024x1024) 的紋理。 這會產生兩個問題：
+
+* 視覺瑕疵 (Artifacts): 採樣器可能會「跳過」過多紋理細節，導致摩爾紋 (Moiré patterns) 或閃爍
+* 效能浪費: 為了畫一個小點，GPU 需要從巨大的記憶體中讀取數據，破壞了 Cache Locality
+
+Mipmaps 是一系列逐漸縮小的紋理圖像。Level 0 是原圖，Level 1 是原圖的一半大小，依此類推。OpenGL 會根據物體距離（或在螢幕上的大小）自動選擇最合適的層級。
+:::
+
 3. 目前頂點資料有 8 個 float 的 stride，接著啟用第 2 個屬性 (Location 2)：
 
 ```cpp
@@ -600,8 +622,6 @@ glVertexArrayAttribBinding(VAO, 2, 0); // 連結到 Binding Point 0
 ```
 
 4. 設定 Shader 與 Texture Units
-
-在現代 OpenGL (4.2+) 中，我們不需要在 C++ 端使用 glUniform1i 來設定 Texture Unit。我們可以直接在 GLSL 中使用 binding 關鍵字。
 
 ```cpp title="shader.vert"
 #version 450 core
@@ -620,6 +640,8 @@ void main()
 }
 ```
 
+自 OpenGL 4.2 之後，我們不需要在 C++ 端使用 `glUniform1i` 來設定 Texture Unit。我們可以直接在 Shader 中指定 binding。
+
 ```cpp title="shader.vert"
 #version 450 core
 out vec4 FragColor;
@@ -627,8 +649,7 @@ out vec4 FragColor;
 in vec3 ourColor;
 in vec2 TexCoord;
 
-// 現代 GLSL：直接指定綁定點 (Binding Point)
-// 這對應到 C++ 中的 Texture Unit
+// 直接指定 Binding Point 0
 layout(binding = 0) uniform sampler2D texture1;
 layout(binding = 1) uniform sampler2D texture2; 
 
@@ -652,10 +673,9 @@ while (!glfwWindowShouldClose(window))
 
     ourShader.use();
 
-    // 綁定紋理到單元 (Binding Units)
-    // 這些索引對應到 Shader 中的 layout(binding = X)
-    glBindTextureUnit(0, texture1); // 將 texture1 綁定到 Unit 0
-    glBindTextureUnit(1, texture2); // 將 texture2 綁定到 Unit 1
+    // 將紋理物件綁定到 Unit 0 (對應 Shader 中的 binding = 0)
+    glBindTextureUnit(0, texture1); // texture1 -> Unit 0
+    glBindTextureUnit(1, texture2); // texture2 -> Unit 1
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
