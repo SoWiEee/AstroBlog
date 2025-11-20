@@ -27,7 +27,7 @@ lang: ""
 2. 到 [GLAD](https://glad.dav1d.de/) 網站選擇開發語言 (C/C++)、OpenGL 版本 (4.5)、使用 Core Profile，勾選 Generate a loader 之後把壓縮檔 `glad.zip` 下載下來
 3. 打開 VS 建立一個空白專案，整理剛剛下載好的檔案在 include 目錄中，結果如下：
 
-```
+```showLineNumbers=false
 include/
 │
 ├── glad/
@@ -182,7 +182,7 @@ int main() {
 
 1. 定義三角形的頂點數據。這些座標位於標準化裝置座標 (NDC) 中，範圍是 $[−1.0,1.0]$。
 
-```cpp
+```cpp showLineNumbers=false
 float vertices[] = {
     -0.5f, -0.5f, 0.0f,
      0.5f, -0.5f, 0.0f,
@@ -193,7 +193,7 @@ float vertices[] = {
 2. 由於我們要請 GPU 繪製三角形，所以需要使用 VBO (Vertex Buffer Object) 來儲存這些數據然後傳給 GPU：
 
 ```cpp
-unsigned int VBO;
+GLuint VBO;
 
 // create VBO buffer (memory)
 glCreateBuffers(1, &VBO);
@@ -203,7 +203,7 @@ glNamedBufferStorage(VBO, sizeof(vertices), vertices, GL_DYNAMIC_STORAGE_BIT);
 ```
 
 :::note
-VBO 是 GPU 顯存中的一塊記憶體區域，用來儲存頂點數據。
+VBO 是 GPU 記憶體中的一塊記憶體區域，用來儲存頂點數據。
 
 由於我們保證不會調整該 VBO 的大小，所以 GPU Driver 可以對這塊記憶體進行更好的優化，像是存放在 VRAM 中存取速度最快的位置。
 :::
@@ -238,17 +238,17 @@ void main()
 // 為了簡潔，假設 shaderSource 是包含上述 GLSL 程式碼的 C-String
 
 // 1. 建立並編譯 Vertex Shader
-unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
 glCompileShader(vertexShader);
 
 // 2. 建立並編譯 Fragment Shader
-unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
 glCompileShader(fragmentShader);
 
 // 3. 連結成 Shader Program
-unsigned int shaderProgram = glCreateProgram();
+GLuint shaderProgram = glCreateProgram();
 glAttachShader(shaderProgram, vertexShader);
 glAttachShader(shaderProgram, fragmentShader);
 glLinkProgram(shaderProgram);
@@ -261,7 +261,7 @@ glDeleteShader(fragmentShader);
 3. 目前有處理頂點的 shader 以及頂點資料，接著要讓頂點資料連接到對應的 shader 輸入，其中用到的物件是 VAO (Vertex Array Object)。
 
 ```cpp
-unsigned int VAO;
+GLuint VAO;
 // create VAO
 glCreateVertexArrays(1, &VAO);
 ```
@@ -313,8 +313,8 @@ glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 3 * sizeof(float));
 
 ## Data Types
 
-- 基礎型別 (int, float, bool)
-- 容器型別 (vec2, vec3, vec4, mat4)
+- 基礎型別：int, float, bool
+- 容器型別：vec2, vec3, vec4, mat4
 - 重組 (Swizzling) 是 GLSL 最強大的特性之一。由於圖形運算大量依賴向量，我們可以隨意組合分量
 
 ```cpp showLineNumbers=false
@@ -376,7 +376,7 @@ float vertices[] = {
 - Location 1: Color (offset 12 bytes)
 
 ```cpp
-unsigned int VAO;
+GLuint VAO;
 glCreateVertexArrays(1, &VAO);
 
 // 1. 連結 VBO 到綁定點 0 (Binding Point 0)
@@ -433,9 +433,9 @@ private:
 ```cpp title="Shader.cpp"
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
-    // ... (讀取檔案內容至 vShaderCode, fShaderCode 字串，同原文) ...
+    // ...
 
-    unsigned int vertex, fragment;
+    GLuint vertex, fragment;
 
     // 建立與編譯 Vertex Shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -558,7 +558,7 @@ int main() {
 ```cpp
 int main() {
     // ...
-    unsigned int texture;
+    GLuint texture;
 
     // create texture
     glCreateTextures(GL_TEXTURE_2D, 1, &texture);
