@@ -55,12 +55,14 @@ include/
 
 ## RenderDoc
 
+- 開源、跨平台、支援 Core OpenGL
+- 可以看到每一個 Draw Call 輸入了什麼 Mesh、輸出了什麼 Pixel，甚至可以檢查 Shader 的中間變數
 - [網站在這](https://renderdoc.org/)
 - [使用說明](https://renderdoc.org/docs/getting_started/quick_start.html)
 
 ## Nvidia Nsight Graphic
 
-- N 卡專用的 debugger, profiler
+- 針對 NVIDIA GPU 高度優化的 debugger, profiler
 - [使用說明](https://docs.nvidia.com/nsight-graphics/UserGuide/index.html)
 
 # 1. Create Window
@@ -134,7 +136,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 ```
 
-OpenGL 的座標系統通常在 −1.0 到 1.0 之間。glViewport 負責將這些資料進行 Viewport Transform。例如，處理後的座標 (−0.5,0.5) 會被映射到螢幕上的 (200,450)。
+OpenGL 的座標系統通常在 $−1.0 \sim 1.0$ 之間。`glViewport` 負責將這些資料進行 Viewport Transform。例如，處理後的座標 $(−0.5,0.5)$ 會被映射到螢幕上的 $(200,450)$。
 
 6. 我們不希望程式畫完一張圖就結束，因此需要一個 render loop，在螢幕刷新時都會重新跑一次：
 
@@ -175,10 +177,10 @@ int main() {
 - 片段著色器：計算最終像素的顏色。這是光照、陰影等進階效果發生的地方。
 
 :::note
-注意在傳統教學網站 LearnOpenGL 上都是使用 3.3 版本的功能撰寫，而在 4.5 版本之後新增了 DSA (Direct State Access) 的功能，讓程式設計師更容易撰寫（但目前仍可以使用 3.3 版本的函數）。
+注意在傳統教學網站 LearnOpenGL 上都是使用 3.3 版本的功能撰寫，而在 4.5 版本之後新增了 DSA (Direct State Access) 的功能，讓程式設計師更容易撰寫（當然也能使用 3.3 版本的函數）。
 :::
 
-1. 定義三角形的頂點數據。這些座標位於標準化裝置座標 (NDC) 中，範圍是 [−1.0,1.0]。
+1. 定義三角形的頂點數據。這些座標位於標準化裝置座標 (NDC) 中，範圍是 $[−1.0,1.0]$。
 
 ```cpp
 float vertices[] = {
@@ -208,7 +210,7 @@ VBO 是 GPU 顯存中的一塊記憶體區域，用來儲存頂點數據。
 
 3. 現在 VRAM 已經有頂點資料了，接著就是請頂點著色器處理這些資料，將輸入的 3D 座標轉換為 NDC：
 
-```glsl
+```glsl showLineNumbers=false
 #version 450 core
 layout (location = 0) in vec3 aPos; // input, ID=0
 
@@ -220,7 +222,7 @@ void main()
 
 4. 建立 Fragment Shader
 
-```glsl
+```glsl showLineNumbers=false
 #version 450 core
 out vec4 FragColor; // output to Framebuffer
 
@@ -283,7 +285,7 @@ glVertexArrayAttribBinding(VAO, 0, 0);
 glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 3 * sizeof(float));
 ```
 
-這種設計讓我們可以輕鬆切換數據來源。例如，如果我們有多個模型共享相同的頂點格式（都是 vec3 pos），我們只需要透過 glVertexArrayVertexBuffer 改變綁定點的來源 Buffer，而不需要重新設定繁瑣的 AttribFormat。
+這種設計讓我們可以輕鬆切換數據來源。例如，如果我們有多個模型共享相同的頂點格式（都是 vec3 pos），我們只需要透過 `glVertexArrayVertexBuffer` 改變綁定點的來源 Buffer，而不需要重新設定繁瑣的 AttribFormat。
 
 6. 在 render loop 裡面繪製三角形：
 
@@ -315,7 +317,7 @@ glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 3 * sizeof(float));
 - 容器型別 (vec2, vec3, vec4, mat4)
 - 重組 (Swizzling) 是 GLSL 最強大的特性之一。由於圖形運算大量依賴向量，我們可以隨意組合分量
 
-```cpp
+```cpp showLineNumbers=false
 vec3 someVec = vec3(1.0, 2.0, 3.0);
 vec4 differentVec = someVec.xyxx; // (1.0, 2.0, 1.0, 1.0)
 vec3 anotherVec = differentVec.zyw; // (1.0, 2.0, 1.0)
@@ -327,7 +329,7 @@ Uniforms 是 CPU 向 GPU 傳送數據的方式。它們是**全域**的 (Global 
 
 1. 修改 fragment shader 讓頂點顏色隨時間變化：
 
-```cpp
+```cpp showLineNumbers=false
 #version 450 core
 out vec4 FragColor;
 uniform vec4 ourColor; // from CPU
@@ -359,7 +361,7 @@ while (!glfwWindowShouldClose(window))
 
 1. 將位置和顏色交錯排列在同一個陣列中。這有助於 Cache Locality：
 
-```cpp
+```cpp showLineNumbers=false
 float vertices[] = {
     // 位置 (XYZ)        // 顏色 (RGB)
      0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // 右下
@@ -500,13 +502,11 @@ while (!glfwWindowShouldClose(window))
 
 ## Texture Coordinates
 
-為了將 2D 圖片貼到 3D 三角形上，我們需要告訴 GPU 三角形的每個頂點(xy)對應圖片的哪個位置(uv)。
-
-原點 (0,0) 代表圖片的左下角，終點 (1,1) 代表圖片的右上角。
+為了將 2D 圖片貼到 3D 三角形上，我們需要告訴 GPU 三角形的每個頂點 $(x,y)$ 對應圖片的哪個位置 $(u,v)$。其中原點 $(0,0)$ 代表圖片的左下角，終點 $(1,1)$ 代表圖片的右上角。
 
 我們需要在頂點數據中加入這些座標：
 
-```cpp
+```cpp showLineNumbers=false
 float vertices[] = {
     // 位置 (XYZ)        // 顏色 (RGB)       // 紋理座標 (UV)
      0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
@@ -541,14 +541,14 @@ int main() {
 
 2. 載入與建立紋理
 
-紋理座標的範圍通常在 (0,0) 到 (1,1) 之間。但如果我們指定的座標超出了這個範圍會發生什麼？OpenGL 提供了多種 環繞模式 (Wrapping Modes) 來決定採樣行為：
+紋理座標的範圍通常在 $(0,0) \sim (1,1)$ 之間。但如果我們指定的座標超出了這個範圍會發生什麼？OpenGL 提供了多種環繞模式 (Wrapping Modes) 來決定採樣行為：
 
-- `GL_REPEAT`：預設行為。重複紋理圖像（忽略座標的整數部分）。
-- `GL_MIRRORED_REPEAT`：類似重複，但在每次重複時鏡像翻轉圖片。
-- `GL_CLAMP_TO_EDGE`：座標被限制在 0 到 1 之間。超出的部分會重複邊緣的像素，產生拉伸效果。
-- `GL_CLAMP_TO_BORDER`：超出範圍的座標會被填入使用者指定的邊緣顏色。
+- `GL_REPEAT`：預設行為，重複紋理圖像
+- `GL_MIRRORED_REPEAT`：類似重複，但在每次重複時鏡像翻轉圖片
+- `GL_CLAMP_TO_EDGE`：座標被限制在 0 到 1 之間。超出的部分會重複邊緣的像素，產生拉伸效果
+- `GL_CLAMP_TO_BORDER`：超出範圍的座標會被填入使用者指定的邊緣顏色
 
-紋理座標是浮點數，可以在任意位置採樣，但紋理圖片是由離散的像素（Texels）組成。OpenGL 需要計算出一個浮點座標到底對應什麼顏色，這就是紋理過濾。主要有兩種情況：
+紋理座標是浮點數，可以在任意位置採樣，但紋理圖片是由離散的像素(Texels)組成。OpenGL 需要計算出一個浮點座標到底對應什麼顏色，這就是紋理過濾。主要有兩種情況：
 
 - Magnification (放大)：當紋理很小，但貼在很大的物體上時。
 - Minification (縮小)：當紋理很大，但物體在畫面上很遠很小時。
@@ -602,8 +602,8 @@ int main() {
 
 想像一個擁有數千個物體的場景。遠處的物體可能在螢幕上只佔幾個像素，但它卻貼著一張高解析度 (1024x1024) 的紋理。 這會產生兩個問題：
 
-- 視覺瑕疵 (Artifacts): 採樣器可能會「跳過」過多紋理細節，導致摩爾紋 (Moiré patterns) 或閃爍
-- 效能浪費: 為了畫一個小點，GPU 需要從巨大的記憶體中讀取數據，破壞了 Cache Locality
+- 視覺瑕疵 (Artifacts)：採樣器可能會「跳過」過多紋理細節，導致摩爾紋 (Moiré patterns) 或閃爍
+- 效能浪費：為了畫一個小點，GPU 需要從巨大的記憶體中讀取數據，破壞了 Cache Locality
 
 Mipmaps 是一系列逐漸縮小的紋理圖像。Level 0 是原圖，Level 1 是原圖的一半大小，依此類推。OpenGL 會根據物體距離（或在螢幕上的大小）自動選擇最合適的層級。
 :::
@@ -620,7 +620,7 @@ glVertexArrayAttribBinding(VAO, 2, 0); // 連結到 Binding Point 0
 
 4. 設定 Shader 與 Texture Units
 
-```cpp title="shader.vert"
+```cpp showLineNumbers=false title="shader.vert"
 #version 450 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aColor;
@@ -639,7 +639,7 @@ void main()
 
 自 OpenGL 4.2 之後，我們不需要在 C++ 端使用 `glUniform1i` 來設定 Texture Unit。我們可以直接在 Shader 中指定 binding。
 
-```cpp title="shader.frag"
+```cpp showLineNumbers=false title="shader.frag"
 #version 450 core
 out vec4 FragColor;
 
@@ -683,7 +683,7 @@ while (!glfwWindowShouldClose(window))
 
 # 5. Coordinate Systems
 
-從系統層面來看，Vertex Shader 的最終目標是輸出標準化裝置座標 (NDC)。這是一個 x,y,z 軸範圍皆為 [−1.0,1.0] 的空間。任何落在這個範圍之外的座標都會被 GPU 的 Clipping 階段剔除。
+從系統層面來看，Vertex Shader 的最終目標是輸出標準化裝置座標 (NDC)。這是一個 $x,y,z$ 軸範圍皆為 $[−1.0,1.0]$ 的空間。任何落在這個範圍之外的座標都會被 GPU 的 Clipping 階段剔除。
 
 為了將任意 3D 場景映射到這個 NDC 空間，我們通常會經過 5 個不同的座標系統。理解這些空間變換是 3D 圖形程式設計的核心。變換流程通常涉及三個關鍵矩陣：Model (模型)、View (視圖)、Projection (投影)，合稱 MVP 矩陣。
 
@@ -709,11 +709,11 @@ $$
 
 ## View/Camera Space
 
-OpenGL 本身並沒有「攝影機」的概念。所謂的攝影機，其實是透過逆向操作來實現的。如果你想將攝影機向後移動（+z 方向），這在數學上等同於將整個世界向前移動（−z 方向）。 View Matrix 的任務就是將世界座標系變換到以攝影機為原點、攝影機視線為 −z 軸的座標系中。
+OpenGL 本身並沒有「攝影機」的概念。所謂的攝影機，其實是透過逆向操作來實現的。如果你想將攝影機向後移動（$+z$ 方向），這在數學上等同於將整個世界向前移動（$−z$ 方向）。 View Matrix 的任務就是將世界座標系變換到以攝影機為原點、攝影機視線為 $−z$ 軸的座標系中。
 
 ## Clip Space
 
-這是最抽象的一步。Vertex Shader 輸出的 `gl_Position` 就在這裡。OpenGL 預期所有可見頂點落在 [−1.0,1.0] 的範圍內。 將 View Space (例如 [−1000,1000]) 壓縮到 NDC 的過程稱為投影。我們主要使用兩種投影方式：
+這是最抽象的一步。Vertex Shader 輸出的 `gl_Position` 就在這裡。OpenGL 預期所有可見頂點落在 $[−1.0,1.0]$ 的範圍內。 將 View Space 壓縮到 NDC 的過程稱為投影。我們主要使用兩種投影方式：
 
 - 正交投影 (Orthographic)：定義一個立方體的視錐體 (frustum)。物體不會因為距離而變小。常用於 2D 渲染或工程製圖。
 
@@ -721,7 +721,7 @@ OpenGL 本身並沒有「攝影機」的概念。所謂的攝影機，其實是�
 
 可以使用先前安裝好的 GLM 來建立透視矩陣：
 
-```cpp
+```cpp showLineNumbers=false frame="none"
 // FOV: 45度, 長寬比: 800/600, 近平面: 0.1, 遠平面: 100.0
 glm::mat4 proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 ```
@@ -783,9 +783,9 @@ while (!glfwWindowShouldClose(window))
 
 3. 如果直接繪製立方體，可以發現遠處的面可能會蓋住近處的面，這是因為 OpenGL 預設是按照繪製順序覆蓋像素。要根據深度來避免這種問題，我們需要使用 Z-Buffer。
 
-這是一個與螢幕解析度相同的緩衝區，儲存每個像素的深度(z)。 當 GPU 想要繪製一個像素時，它會檢查 Z-Buffer：
+這是一個與螢幕解析度相同的緩衝區，儲存每個像素的深度$(z)$。 當 GPU 想要繪製一個像素時，它會檢查 Z-Buffer：
 
-- 如果新像素的 z 值小於緩衝區中的值（更靠近攝影機），則繪製並更新 Z-Buffer
+- 如果新像素的 $z$ 值小於緩衝區中的值（更靠近攝影機），則繪製並更新 Z-Buffer
 - 否則，丟棄該像素
 
 ```cpp
