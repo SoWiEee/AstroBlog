@@ -598,7 +598,7 @@ int main() {
 }
 ```
 
-:::note Mipmaps
+:::note[Mipmaps]
 
 想像一個擁有數千個物體的場景。遠處的物體可能在螢幕上只佔幾個像素，但它卻貼著一張高解析度 (1024x1024) 的紋理。 這會產生兩個問題：
 
@@ -683,7 +683,7 @@ while (!glfwWindowShouldClose(window))
 
 # 5. Coordinate Systems
 
-從系統層面來看，Vertex Shader 的最終目標是輸出標準化裝置座標 (Normalized Device Coordinates, NDC)。這是一個 x,y,z 軸範圍皆為 [−1.0,1.0] 的空間。任何落在這個範圍之外的座標都會被 GPU 的 Clipping 階段剔除。
+從系統層面來看，Vertex Shader 的最終目標是輸出標準化裝置座標 (NDC)。這是一個 x,y,z 軸範圍皆為 [−1.0,1.0] 的空間。任何落在這個範圍之外的座標都會被 GPU 的 Clipping 階段剔除。
 
 為了將任意 3D 場景映射到這個 NDC 空間，我們通常會經過 5 個不同的座標系統。理解這些空間變換是 3D 圖形程式設計的核心。變換流程通常涉及三個關鍵矩陣：Model (模型)、View (視圖)、Projection (投影)，合稱 MVP 矩陣。
 
@@ -696,7 +696,7 @@ while (!glfwWindowShouldClose(window))
 一個頂點 $V_{local}$​ 經過變換成為裁剪座標 $V_{clip}$​ 的公式為：
 
 $$
-V_{clip}​ = M_{projection​} \dot M_{view​} \dot M_{model}​ \dot V_{local}​
+V_{clip}​ = M_{projection​} \times M_{view​} \times M_{model}​ \times V_{local}​
 $$
 
 ## Local Space
@@ -748,7 +748,7 @@ void main()
 }
 ```
 
-2. 使用 DSA 的 glProgramUniformMatrix4fv，我們可以不需綁定 (Bind) Shader Program 就能更新它的 Uniform。
+2. 使用 DSA 的 `glProgramUniformMatrix4fv`，我們可以不綁定 Shader Program 就能更新它的 Uniform。
 
 ```cpp
 // Render Loop
