@@ -1,23 +1,23 @@
 ---
 title: Modern OpenGL Beginner Guide
 published: 2025-11-17
-description: ''
-image: ''
+description: ""
+image: ""
 tags: [CS]
-category: 'Note'
-draft: false 
-lang: ''
+category: "Note"
+draft: false
+lang: ""
 ---
 
 由於 LearnOpenGL 上的資料都是舊版 (3.3) 的，所以撰寫一篇現代版本 (4.5) 的環境建置教學。
 
 # OpenGL
 
-* 通常在學校的計算機圖學課程會使用這個東西來實作程式
-* 本身是由 Khronos 組織制定及維護的規範，是一個 spec
-* 早期是立即渲染模式，但是效率太低，從 3.2 之後鼓勵開發者在 Core-profile 下進行開發
-* 由於全域狀態的存在，早期 OpenGL 程式碼的正確性難以審核，迫使程式設計師不斷考慮 API 指令模糊不清的 scope
-* 在 OpenGL 4.5 之後解決或緩解了許多此類問題
+- 通常在學校的計算機圖學課程會使用這個東西來實作程式
+- 本身是由 Khronos 組織制定及維護的規範，是一個 spec
+- 早期是立即渲染模式，但是效率太低，從 3.2 之後鼓勵開發者在 Core-profile 下進行開發
+- 由於全域狀態的存在，早期 OpenGL 程式碼的正確性難以審核，迫使程式設計師不斷考慮 API 指令模糊不清的 scope
+- 在 OpenGL 4.5 之後解決或緩解了許多此類問題
 
 # Environment Setup
 
@@ -44,8 +44,8 @@ include/
 
 - VC++目錄＞包含目錄＞加入 `glm/`
 - C/C++＞一般＞加入 `glfw\include`、`glad\include`、`glm`
-- Linker＞其他函數庫目錄＞加入 `glfw\lib-vc2022`
-- Linker＞輸入＞加入 `glfw3.lib`、`opengl32.lib`
+- Linker ＞其他函數庫目錄＞加入 `glfw\lib-vc2022`
+- Linker ＞輸入＞加入 `glfw3.lib`、`opengl32.lib`
 
 5. 這樣就完成基本的環境建置了，執行起來後應該會動 XD
 
@@ -55,15 +55,13 @@ include/
 
 ## RenderDoc
 
-* [網站在這](https://renderdoc.org/)
-* [使用說明](https://renderdoc.org/docs/getting_started/quick_start.html)
-
+- [網站在這](https://renderdoc.org/)
+- [使用說明](https://renderdoc.org/docs/getting_started/quick_start.html)
 
 ## Nvidia Nsight Graphic
 
-* N 卡專用的 debugger, profiler
-* [使用說明](https://docs.nvidia.com/nsight-graphics/UserGuide/index.html)
-
+- N 卡專用的 debugger, profiler
+- [使用說明](https://docs.nvidia.com/nsight-graphics/UserGuide/index.html)
 
 # 1. Create Window
 
@@ -173,8 +171,8 @@ int main() {
 
 在現代 OpenGL 中，我們可以自訂義 3 個著色器 (Shader)，並且至少要有頂點著色器 (Vertex Shader) 和片段著色器 (Fragment Shader) 才能讓程式正常運作。
 
-* 頂點著色器：處理單個頂點的屬性（位置、顏色、紋理座標）。它的主要工作是進行座標變換（將 3D 空間座標轉換為裁剪空間座標）
-* 片段著色器：計算最終像素的顏色。這是光照、陰影等進階效果發生的地方。
+- 頂點著色器：處理單個頂點的屬性（位置、顏色、紋理座標）。它的主要工作是進行座標變換（將 3D 空間座標轉換為裁剪空間座標）
+- 片段著色器：計算最終像素的顏色。這是光照、陰影等進階效果發生的地方。
 
 :::note
 注意在傳統教學網站 LearnOpenGL 上都是使用 3.3 版本的功能撰寫，而在 4.5 版本之後新增了 DSA (Direct State Access) 的功能，讓程式設計師更容易撰寫（但目前仍可以使用 3.3 版本的函數）。
@@ -307,15 +305,15 @@ glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 3 * sizeof(float));
 
 # 3. Shader Advanced
 
-在上一章我們提到，Shader 是運行在 GPU 上的微型程式。從計算機科學的角度來看，GPU 是大規模平行處理器 (SIMD架構)，而 Shader 就是這些核心上執行的核心邏輯 (Kernel)。它們是高度隔離的——Shader 之間無法直接通訊，唯一的溝通橋樑是 輸入 (Input) 與 輸出 (Output) 變數。
+在上一章我們提到，Shader 是運行在 GPU 上的微型程式。從計算機科學的角度來看，GPU 是大規模平行處理器 (SIMD 架構)，而 Shader 就是這些核心上執行的核心邏輯 (Kernel)。它們是高度隔離的——Shader 之間無法直接通訊，唯一的溝通橋樑是 輸入 (Input) 與 輸出 (Output) 變數。
 
 我們使用 GLSL (OpenGL Shading Language) 來撰寫 Shader。它是一種強型別的 C-style 語言，專門為了向量與矩陣運算而生。
 
 ## Data Types
 
-* 基礎型別 (int, float, bool)
-* 容器型別 (vec2, vec3, vec4, mat4)
-* 重組 (Swizzling) 是 GLSL 最強大的特性之一。由於圖形運算大量依賴向量，我們可以隨意組合分量
+- 基礎型別 (int, float, bool)
+- 容器型別 (vec2, vec3, vec4, mat4)
+- 重組 (Swizzling) 是 GLSL 最強大的特性之一。由於圖形運算大量依賴向量，我們可以隨意組合分量
 
 ```cpp
 vec3 someVec = vec3(1.0, 2.0, 3.0);
@@ -372,8 +370,8 @@ float vertices[] = {
 
 2. 告訴 OpenGL 如何解讀這個 Buffer，我們現在有 2 個屬性：
 
-* Location 0: Position (offset 0)
-* Location 1: Color (offset 12 bytes)
+- Location 0: Position (offset 0)
+- Location 1: Color (offset 12 bytes)
 
 ```cpp
 unsigned int VAO;
@@ -436,7 +434,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     // ... (讀取檔案內容至 vShaderCode, fShaderCode 字串，同原文) ...
 
     unsigned int vertex, fragment;
-    
+
     // 建立與編譯 Vertex Shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex, 1, &vShaderCode, NULL);
@@ -491,7 +489,7 @@ while (!glfwWindowShouldClose(window))
     ourShader.use();
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 3);
-    
+
     // ...
 }
 ```
@@ -514,16 +512,15 @@ float vertices[] = {
      0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
      0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
     -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上 
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
 };
 ```
 
-## 2. Texture Object
+## Texture Object
 
 不同於 3.3 版本，4.5 使用 Immutable Storage 的模式儲存紋理，首先會使用 `glTextureStorage2D()` 一次性宣告紋理的大小、格式和 Mipmap 層數，接著呼叫 `glTextureSubImage2D()` 將數據填入已分配的記憶體。
 
 1. 使用 `stb_image.h` 來載入紋理圖片，去[這裡](https://github.com/nothings/stb/blob/master/stb_image.h)下載然後放到專案根目錄即可
-
 
 注意 OpenGL 的 Y 軸 0 在底部，圖片通常在頂部，所以我們需要翻轉 Y 軸。
 
@@ -546,17 +543,17 @@ int main() {
 
 紋理座標的範圍通常在 (0,0) 到 (1,1) 之間。但如果我們指定的座標超出了這個範圍會發生什麼？OpenGL 提供了多種 環繞模式 (Wrapping Modes) 來決定採樣行為：
 
-* `GL_REPEAT`：預設行為。重複紋理圖像（忽略座標的整數部分）。
-* `GL_MIRRORED_REPEAT`：類似重複，但在每次重複時鏡像翻轉圖片。
-* `GL_CLAMP_TO_EDGE`：座標被限制在 0 到 1 之間。超出的部分會重複邊緣的像素，產生拉伸效果。
-* `GL_CLAMP_TO_BORDER`：超出範圍的座標會被填入使用者指定的邊緣顏色。
+- `GL_REPEAT`：預設行為。重複紋理圖像（忽略座標的整數部分）。
+- `GL_MIRRORED_REPEAT`：類似重複，但在每次重複時鏡像翻轉圖片。
+- `GL_CLAMP_TO_EDGE`：座標被限制在 0 到 1 之間。超出的部分會重複邊緣的像素，產生拉伸效果。
+- `GL_CLAMP_TO_BORDER`：超出範圍的座標會被填入使用者指定的邊緣顏色。
 
 紋理座標是浮點數，可以在任意位置採樣，但紋理圖片是由離散的像素（Texels）組成。OpenGL 需要計算出一個浮點座標到底對應什麼顏色，這就是紋理過濾。主要有兩種情況：
 
-* Magnification (放大)：當紋理很小，但貼在很大的物體上時。
-* Minification (縮小)：當紋理很大，但物體在畫面上很遠很小時。
-* `GL_NEAREST` (鄰近採樣)：選擇中心點最接近紋理座標的那個 Texel。這會產生顆粒感，適合像素風格遊戲。
-* `GL_LINEAR` (線性採樣)：獲取座標附近的 Texels 進行雙線性插值。這會產生較平滑模糊的效果。
+- Magnification (放大)：當紋理很小，但貼在很大的物體上時。
+- Minification (縮小)：當紋理很大，但物體在畫面上很遠很小時。
+- `GL_NEAREST` (鄰近採樣)：選擇中心點最接近紋理座標的那個 Texel。這會產生顆粒感，適合像素風格遊戲。
+- `GL_LINEAR` (線性採樣)：獲取座標附近的 Texels 進行雙線性插值。這會產生較平滑模糊的效果。
 
 ```cpp
 int main() {
@@ -605,8 +602,8 @@ int main() {
 
 想像一個擁有數千個物體的場景。遠處的物體可能在螢幕上只佔幾個像素，但它卻貼著一張高解析度 (1024x1024) 的紋理。 這會產生兩個問題：
 
-* 視覺瑕疵 (Artifacts): 採樣器可能會「跳過」過多紋理細節，導致摩爾紋 (Moiré patterns) 或閃爍
-* 效能浪費: 為了畫一個小點，GPU 需要從巨大的記憶體中讀取數據，破壞了 Cache Locality
+- 視覺瑕疵 (Artifacts): 採樣器可能會「跳過」過多紋理細節，導致摩爾紋 (Moiré patterns) 或閃爍
+- 效能浪費: 為了畫一個小點，GPU 需要從巨大的記憶體中讀取數據，破壞了 Cache Locality
 
 Mipmaps 是一系列逐漸縮小的紋理圖像。Level 0 是原圖，Level 1 是原圖的一半大小，依此類推。OpenGL 會根據物體距離（或在螢幕上的大小）自動選擇最合適的層級。
 :::
@@ -617,7 +614,7 @@ Mipmaps 是一系列逐漸縮小的紋理圖像。Level 0 是原圖，Level 1 �
 // 設定屬性 2 (Texture Coords)
 glEnableVertexArrayAttrib(VAO, 2);
 // 格式：2個 float, offset 為 6 * sizeof(float)
-glVertexArrayAttribFormat(VAO, 2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float)); 
+glVertexArrayAttribFormat(VAO, 2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float));
 glVertexArrayAttribBinding(VAO, 2, 0); // 連結到 Binding Point 0
 ```
 
@@ -642,7 +639,7 @@ void main()
 
 自 OpenGL 4.2 之後，我們不需要在 C++ 端使用 `glUniform1i` 來設定 Texture Unit。我們可以直接在 Shader 中指定 binding。
 
-```cpp title="shader.vert"
+```cpp title="shader.frag"
 #version 450 core
 out vec4 FragColor;
 
@@ -651,14 +648,14 @@ in vec2 TexCoord;
 
 // 直接指定 Binding Point 0
 layout(binding = 0) uniform sampler2D texture1;
-layout(binding = 1) uniform sampler2D texture2; 
+layout(binding = 1) uniform sampler2D texture2;
 
 void main()
 {
     // mix texture
     vec4 col1 = texture(texture1, TexCoord);
     vec4 col2 = texture(texture2, TexCoord);
-    
+
     // 混合 80% col1 和 20% col2
     FragColor = mix(col1, col2, 0.2);
 }
@@ -683,4 +680,3 @@ while (!glfwWindowShouldClose(window))
     // ... (Swap Buffers) ...
 }
 ```
-
