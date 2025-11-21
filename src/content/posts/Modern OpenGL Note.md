@@ -21,14 +21,15 @@ lang: ""
 
 # Environment Setup
 
-這篇文章會教你建置環境到繪製出三角形，這邊使用 Visual Studio 2022 作為 IDE，並搭配 GLAD, GLFW 來建置，此外我們也會常常需要做數學運算，這邊也順便下載 GLM。
+這篇文章會教你建置環境到繪製出三角形，這邊使用 Visual Studio 2022 作為 IDE，並搭配 GLAD, GLFW 來建置，此外我們也會常常需要做數學運算，這邊也順便下載 [GLM](https://github.com/g-truc/glm)。
 
 1. 到 [GLFW](https://www.glfw.org/download.html) 網站找到自己的 OS 及 Arch，就能下載預編譯好的函式庫 `glfw3.lib`
 2. 到 [GLAD](https://glad.dav1d.de/) 網站選擇開發語言 (C/C++)、OpenGL 版本 (4.5)、使用 Core Profile，勾選 Generate a loader 之後把壓縮檔 `glad.zip` 下載下來
-3. 打開 VS 建立一個空白專案，整理剛剛下載好的檔案在 include 目錄中，結果如下：
+3. 如果想做簡易的 GUI 的話可以用 [Imgui](https://github.com/ocornut/imgui)，把原始碼下載下來就行
+4. 打開 VS 建立一個空白專案，整理剛剛下載好的檔案在自建的 library 目錄中，然後放到專案目錄底下：
 
-```showLineNumbers=false
-include/
+```txt showLineNumbers=false
+library/
 │
 ├── glad/
 │   ├── include/
@@ -36,14 +37,17 @@ include/
 ├── glfw/
 │   ├── include/
 │   └── lib-vc2022/
-└── glm
-    └── glm/
+├── glm/
+│   └── glm/
+│
+└── imgui/
+    └── backends/
 ```
 
-4. 這邊不使用 CMake 來管理，而是用 Visual Studio 內建的管理工具。首先到專案＞屬性
+4. 這邊用 Visual Studio 內建的管理工具。到專案＞屬性
 
 - VC++目錄＞包含目錄＞加入 `glm/`
-- C/C++＞一般＞加入 `glfw\include`、`glad\include`、`glm`
+- C/C++＞一般＞加入 `glfw\include`、`glad\include`、`glm`、`imgui`、`imgui/backends`
 - Linker ＞其他函數庫目錄＞加入 `glfw\lib-vc2022`
 - Linker ＞輸入＞加入 `glfw3.lib`、`opengl32.lib`
 
