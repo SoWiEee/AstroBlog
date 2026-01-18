@@ -1,9 +1,9 @@
 ---
-title: Flare-On 12 Writeup
+title: Flare-On 2025 Writeup
 published: 2025-10-25
 description: ''
 image: ''
-tags: [CTF]
+tags: [CTF, InfoSec]
 category: 'Writeup'
 draft: false
 lang: ''
