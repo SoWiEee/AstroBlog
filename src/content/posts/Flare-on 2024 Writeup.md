@@ -1,5 +1,5 @@
 ---
-title: Flare-on 2024 Writeup
+title: Flare-On 2024 Writeup
 published: 2025-08-07
 description: ''
 image: ''
