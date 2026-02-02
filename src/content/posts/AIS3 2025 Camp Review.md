@@ -11,13 +11,7 @@ lang: ''
 
 # Introduction
 
-所幸這次 Pre-exam 有上，在 7/28 ~ 8/3 在交大進行 7 天的培訓，行程表大致如下：
-
-1. Windows Kernel、LLM analysis
-2. 
-
-
-並且這次分成 4 個組別，分別是：
+所幸這次 Pre-exam 有上，在 7/28 ~ 8/3 在交大進行 7 天的培訓，行程表可以看[這個](https://ais3.org/home/course)。並且這次分成 4 個組別，分別是：
 
 * 軟體、網頁及 IoT 安全
 * 典範轉移:AI 時代的情資運用及防禦
