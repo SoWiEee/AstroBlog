@@ -1,5 +1,5 @@
 ---
-title: Heptabase Beginner
+title: Heptabase Experience
 published: 2026-02-03
 description: ''
 image: ''
