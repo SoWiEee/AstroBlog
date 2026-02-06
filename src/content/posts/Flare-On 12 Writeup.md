@@ -191,57 +191,6 @@ print(plain.decode())
 7. 以 username@compname 當作 key 來恢復加密資料，明文是 `{"ack": "` 開頭，解密得到 TheBoss@THUNDERNODE
 8. Stage 2 是標準 AES-256 解密，與前面解密 C2 server 的資料有關，並且 IV 沒變
 
-
-
-# Challenge 8 - FlareAuthenticator
-
-> We recovered a legacy authenticator from an old hard disk, but the password has been lost and we only remember that there was a single password to unlock it. We need your help to analyze the program and find a way to get back in. Can you recover the password?
-
-1. 題目提供了一堆檔案，主文件是 `FlareAuthenticator.exe`
-
-```
-vcruntime140_1.dll
-vcruntime140.dll
-run.bat
-qwindows.dll
-Qt6Widgets.dll
-Qt6Gui.dll
-Qt6Core.dll
-msvcp140_2.dll
-msvcp140_1.dll
-msvcp140.dll
-FlareAuthenticator.exe
-```
-
-2. 先用 IDA 看一看
-
-3. 接著用 x64dbg 看看到彈出錯誤視窗時發生什麼事情
-
-# Challenge 9 - 10000
-
-1. 給了一個 windows 執行檔 `10000.exe`
-2. 打開 IDA 看一看 main `sub_140001E87()`
-3. 大致的邏輯是：
-    * 讀取檔案 license.bin
-    * 裡面包含 PE file
-    * license 解析後有 10000 個 entry，每個 entry 包含 resource ID 及 32-bit input 進行驗證
-    * 每個 entry 都有載入 rsrc id 對應的 DLL，在 entryPoint 用相同的參數做初始化
-4. 隨便開一個來分析，可以看到 `DllMain()` 裡面有一個 counter array 0x140109040
-5. 裡面有一個 `_Z5checkPh` 以 32-byte 當作參數進行呼叫，每次檢查後都把每個 loeaded PE counter array 遞增
-6. 目標是讓每個 check 驗證都通過，並且符合 final counter array 的狀態
-7. 用 PE File 提取所有 DLL 資源，但會發現開頭不是 `MZ`，感覺有被處理過（應該不是加密）
-8. 用 aplib 解壓縮看看，其中可以看到 IDA 標黃色的函數是 import function
-
-## Counter Array
-
-* DLL 有特定的順序
-* 當載入 DLL 時，裡面所 import 的 DLL 都會被載入
-* 接著執行 `check()`
-    * 更新 counter array
-    * rsrc id 將增加 loop 循環的次數
-* 已載入的 DLL 清單會被重置，並對下一個 license entry 重複這個程序
-* 可以嘗試用 counter array 的最終狀態反推
-
 # Afterword
 
 要是早天開賽搞不好能破台，前幾個月有解去年的 1~5 題，這次，並且學到 EVM decompile、分析 C2 Communication 的設計等等。感覺今年好多 python，在 decompile 的時候也很依賴版本，像是第 3 題的 header 就修了一陣子才能餵給 decompiler。這個比賽算是目前為止打 CTF 比較投入解題，感覺繼續往下分析又能看到新東西、新線索，離理解程式又更接近一步。同時也發現自己需要一個比較有系統化的解題方法，像是前幾題每題就花了好幾個小時，這可能要隨著越來越多經驗才能比較知道該怎麼做。
