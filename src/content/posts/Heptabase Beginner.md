@@ -61,3 +61,9 @@ Heptabase 的白板提供了空間感，讓我能把相關的卡片擺在一起�
 
 這大概就是 Heptabase 帶給我最大的思維轉變：筆記的目的不是為了紀錄過去，而是為了支援未來的思考。
 
+> 2026/02/19 Update：之後有看到一些資源可以參考：
+> - [Heptabase Gallery](https://heptabase.com/gallery)
+> - [Pin 起來](https://pinchlime.com/)：Heptabase 團隊中 Customer Experience Manager 的部落格
+> - [Heptabase Discord](https://discord.com/invite/KAkXjPX8Yn)：有一個頻道 `share-user-cases` 會有人分享自己的使用方法
+
+
