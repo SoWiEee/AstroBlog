@@ -39,7 +39,7 @@ lang: ''
 
 最後會幫你整理出課程重點筆記，會集中放在課程用的白板中，藍線的部分可以連結到原本該小節的課程教材，如果課程最後有 Review 的話也會整理到課程重點筆記中，要複習的時候真的蠻方便的！
 
-![Source](../../assets/images/Heptabase/heptabase_8.png)
+![Source](../../assets/images/Heptabase/Heptabase_8.png)
 
 # Afterword
 
