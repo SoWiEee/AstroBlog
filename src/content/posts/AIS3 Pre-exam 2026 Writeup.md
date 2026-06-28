@@ -5,7 +5,7 @@ description: ''
 image: 'ais3.png'
 tags: [CTF]
 category: 'Writeup'
-draft: true 
+draft: false 
 lang: ''
 ---
 
