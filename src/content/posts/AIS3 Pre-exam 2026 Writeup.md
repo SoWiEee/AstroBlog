@@ -11,7 +11,7 @@ lang: ''
 
 # Summary
 
-這是第三年打 pre-exam，拿到 18 名，比去年進步 53 幾名，感謝 AI Agent 的幫助 :)
+這是第三年打 pre-exam，拿到 18 名，比去年進步 53 名，感謝 AI Agent 的幫助 :)
 
 ![Source](../../assets/images/AIS3_2026/summary.png)
 
