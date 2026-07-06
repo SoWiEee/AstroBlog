@@ -62,7 +62,7 @@
     "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
-    "@astrojs/ts-plugin": "^1.10.9",
+    "@astrojs/ts-plugin": "^1.10.10",
     "@biomejs/biome": "2.5.2",
     "@iconify-json/ic": "^1.2.4",
     "@rollup/plugin-yaml": "^4.1.2",
