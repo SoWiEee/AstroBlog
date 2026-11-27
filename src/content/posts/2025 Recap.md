@@ -1,11 +1,12 @@
 ---
+
 title: 2025 Recap
 published: 2026-01-10
 description: ''
 image: ''
 tags: [Misc]
 category: 'Note'
-draft: false 
+draft: false
 lang: ''
 ---
 

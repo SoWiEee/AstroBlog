@@ -1,4 +1,5 @@
 ---
+
 title: Markdown Example
 published: 2023-10-01
 description: A simple example of a Markdown blog post.
@@ -71,7 +72,6 @@ for i in range(10):
 Now a nested list:
 
 1.  First, get these ingredients:
-
     - carrots
     - celery
     - lentils
@@ -166,8 +166,8 @@ $$
 \begin{equation*}
 \pi
 =3.1415926535
- \;8979323846\;2643383279\;5028841971\;6939937510\;5820974944
- \;5923078164\;0628620899\;8628034825\;3421170679\;\ldots
+\;8979323846\;2643383279\;5028841971\;6939937510\;5820974944
+\;5923078164\;0628620899\;8628034825\;3421170679\;\ldots
 \end{equation*}
 $$
 

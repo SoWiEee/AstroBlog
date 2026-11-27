@@ -1,11 +1,12 @@
 ---
+
 title: AIS3 Pre-exam 2025 Writeup
 published: 2025-07-06
 description: ''
 image: 'ais3.png'
 tags: [CTF]
 category: 'Writeup'
-draft: false 
+draft: false
 lang: ''
 ---
 
@@ -18,7 +19,8 @@ lang: ''
 ---
 
 # Welcome
-* Tag：`Misc`
+
+- Tag：`Misc`
 
 1. 照打就拿到了
 
@@ -28,7 +30,7 @@ lang: ''
 
 # Login Screen 1
 
-* Tag：`Web` `Easy`
+- Tag：`Web` `Easy`
 
 1. 看原始碼
 
@@ -50,7 +52,7 @@ lang: ''
 
 # Welcome to the World of Ave Mujica🌙
 
-* Tag：`Pwn` `Easy`
+- Tag：`Pwn` `Easy`
 
 1. 先用 IDA 分析看看，有 BOF
 
@@ -100,9 +102,10 @@ r.interactive()
 
 # Stream
 
-* Tag：`Crypto`
+- Tag：`Crypto`
 
 解密流程：
+
 1. 逐行枚舉 256 個可能，找到唯一能讓(cipher XOR sha512(byte)) 成為**完全平方**的 byte，進而恢復 b_i
 2. 把每個 b_i 拆成 8 個 32-bit 整數（640 個）。前 624 個可重建 `MT19937` 狀態
 3. 逆 temper，組成 random.Random 的 state=(3, tuple, 624)
@@ -199,7 +202,7 @@ def main():
 
 # Ramen CTF
 
-* Tag：`Misc`
+- Tag：`Misc`
 
 1. 看到圖片就想用 binwalk 看，但沒東西
 
@@ -214,7 +217,7 @@ def main():
 
 # web flag checker
 
-* Tag：`Misc` `Easy`
+- Tag：`Misc` `Easy`
 
 1. 這題就只給了輸入框，但亂輸入一些東西是沒反應
 2. F12 看看有 Web Assemaly `index.wasm`，拿去 [decompile](https://github.com/WebAssembly/wabt)
@@ -366,11 +369,12 @@ print(flag.decode())
 
 # AIS3{W4SM_R3v3rsing_w17h_g0_4pp_39229dd}
 ```
+
 ---
 
 # Random_RSA
 
-* Tag：`Crypto` `Medium`
+- Tag：`Crypto` `Medium`
 
 1. 檢查一下，可以發現參數太小
 
@@ -453,7 +457,7 @@ print(flag.decode())
 
 # AIS3 Tiny Server - Misc | Web
 
-* Tag：`Misc` `Easy`
+- Tag：`Misc` `Easy`
 
 1. 先把機器打開，[這篇文章](https://ctftime.org/writeup/22050)說可以用 `//` 跳出來，然後就看到根目錄
 
@@ -467,8 +471,8 @@ print(flag.decode())
 
 # AIS3 Tiny Server - Reverse
 
-* Tag：`Rev` `Easy`
-  
+- Tag：`Rev` `Easy`
+
 1. 先打開 IDA 看看，`sub_1E20` 感覺很可疑
 
 ![Source](../../assets/images/AIS3_2025/tiny3.png)
@@ -499,7 +503,7 @@ print(flag.decode())
 
 # SlowECDSA
 
-* Tag：`Crypto` `Hard`
+- Tag：`Crypto` `Hard`
 
 1. 每次簽名的隨機數 k 是由 LCG 生成： $k_{i+1}=a\times k_{i}+c \text{ (mod n)}$
 2. 簽名(r, s)：$s=k^{-1}(h+r\times d) \text{ (mod n)}$
@@ -564,8 +568,8 @@ io.interactive()
 
 # A_simple_snake_game
 
-* Tag：`Rev` `Baby`
-  
+- Tag：`Rev` `Baby`
+
 1. 玩了 5 分鐘還沒贏 :(
 2. 打開 IDA decompile 看看
 3. 猜測獲勝會顯示 flag，可以找找 Text 相關的函式，如 `SnakeGame::Screen::drawText()`

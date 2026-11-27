@@ -1,11 +1,12 @@
 ---
+
 title: TeamT5 Security Camp 2026
 published: 2026-01-18
 description: ''
 image: 'teamt5.png'
 tags: [InfoSec]
 category: 'Note'
-draft: false 
+draft: false
 lang: ''
 ---
 

@@ -1,4 +1,5 @@
 ---
+
 title: Flare-On 2025 Writeup
 published: 2025-10-25
 description: ''
@@ -110,15 +111,15 @@ print(flag)
 > Congratulations, you are well past half finished with FLARE-On 12! its all downhill from here. Maybe you should just procrastinate and finish up these last couple of challenges on the last day.
 
 1. 執行檔 chat_client 有使用 PyInstaller 打包，在 ELF 裡面有幾個關鍵部分
-    - Python VM：執行 python 所需的 library
-    - 打包資源：包含所有 .pyc 檔案
-    - C/C++ 啟動程式碼：初始化、網路連接、嵌入 Python 引擎的程式
+   - Python VM：執行 python 所需的 library
+   - 打包資源：包含所有 .pyc 檔案
+   - C/C++ 啟動程式碼：初始化、網路連接、嵌入 Python 引擎的程式
 2. 先用 PyInstaller Extractor 提取出 pkg archive
 3. 把 `challenge_to_compile.pyc` 還原成原始碼
 4. 可以看到程式邏輯：
-    - 產生機器獨立的 seed
-    - 用 LCG XOR 加密
-    - 安全模式使用 RSA 加密
+   - 產生機器獨立的 seed
+   - 用 LCG XOR 加密
+   - 安全模式使用 RSA 加密
 5. 其中 LCG XOR 的詳細邏輯可以反編譯 contract_bytes
 ```solidity
 function NextVal(uint256 a, uint256 c, uint256 m, uint256 state, uint256 cnt) public payable {
@@ -134,6 +135,7 @@ function NextVal(uint256 a, uint256 c, uint256 m, uint256 state, uint256 cnt) pu
     return v6;
 }
 ```
+
 6. 當然也可以反編譯出 TripleXOR 的邏輯
 ```solidity
 function encrypt(uint256 prime_lcg, uint256 conv_time, bytes plaintext) public payable {
@@ -148,6 +150,7 @@ function encrypt(uint256 prime_lcg, uint256 conv_time, bytes plaintext) public p
     return v1 ^ prime_lcg ^ conv_time;
 }
 ```
+
 7. 需要用 chat_log.json 先解出 seed, LCG 參數，已知 7 組明文密文對，顯然可以解聯立
 8. 得到 `It's W3b3_i5_Gr8@flare-on.com`
 
@@ -165,10 +168,11 @@ function encrypt(uint256 prime_lcg, uint256 conv_time, bytes plaintext) public p
 .rdata:00000001404686C8       dq offset sub_140001060
 .rdata:00000001404686D0       dq offset sub_1400010F0
 ```
+
 4. 可以發現分成 2 個階段，第一次握手及第二次傳遞受害電腦的資料
 5. 開始動態分析，但由於有開 ASLR，這樣如果要重新 debug 的時候就要調一次 base，記得把那個修掉
-5. 要先解出握手識別，這個 C2 Server 加密訊息也會用到
-6. Stage 1 根據 username@compname (key) 加密後產生 Bearer，有發現 S-box，寫個腳本還原出 `TheBoss@THUNDERNODE`
+6. 要先解出握手識別，這個 C2 Server 加密訊息也會用到
+7. Stage 1 根據 username@compname (key) 加密後產生 Bearer，有發現 S-box，寫個腳本還原出 `TheBoss@THUNDERNODE`
 
 ```python
 sbox = "52 09 6A D5 30 36 A5 38 BF 40 A3 9E 81 F3 D7 FB 7C E3 39 82 9B 2F FF 87 34 8E 43 44 C4 DE E9 CB 54 7B 94 32 A6 C2 23 3D EE 4C 95 0B 42 FA C3 4E 08 2E A1 66 28 D9 24 B2 76 5B A2 49 6D 8B D1 25 72 F8 F6 64 86 68 98 16 D4 A4 5C CC 5D 65 B6 92 6C 70 48 50 FD ED B9 DA 5E 15 46 57 A7 8D 9D 84 90 D8 AB 00 8C BC D3 0A F7 E4 58 05 B8 B3 45 06 D0 2C 1E 8F CA 3F 0F 02 C1 AF BD 03 01 13 8A 6B 3A 91 11 41 4F 67 DC EA 97 F2 CF CE F0 B4 E6 73 96 AC 74 22 E7 AD 35 85 E2 F9 37 E8 1C 75 DF 6E 47 F1 1A 71 1D 29 C5 89 6F B7 62 0E AA 18 BE 1B FC 56 3E 4B C6 D2 79 20 9A DB C0 FE 78 CD 5A F4 1F DD A8 33 88 07 C7 31 B1 12 10 59 27 80 EC 5F 60 51 7F A9 19 B5 4A 0D 2D E5 7A 9F 93 C9 9C EF A0 E0 3B 4D AE 2A F5 B0 C8 EB BB 3C 83 53 99 61 17 2B 04 7E BA 77 D6 26 E1 69 14 63 55 21 0C 7D"
@@ -197,7 +201,7 @@ print(plain.decode())
 
 最後就把這次有學到的記錄下來：
 
-* PDF 文件架構與隱寫
-* C2 交互設計、密碼學
-* 如何分析有混淆的程式
-* 靜態結合動態分析
+- PDF 文件架構與隱寫
+- C2 交互設計、密碼學
+- 如何分析有混淆的程式
+- 靜態結合動態分析

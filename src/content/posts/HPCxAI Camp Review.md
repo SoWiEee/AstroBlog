@@ -1,11 +1,12 @@
 ---
+
 title: HPCxAI Camp Review
 published: 2025-07-26
 description: ''
 image: ''
 tags: [CS]
 category: 'Note'
-draft: false 
+draft: false
 lang: ''
 ---
 
@@ -21,37 +22,33 @@ lang: ''
 
 最後是交通的部分，由於我有申請提前住宿，並且總召建議在 `19:00` 到達小吃部(學生餐廳)，所以是搭高鐵然後接著 182 公車，下來之後會走 10 分鐘左右才會走到小吃部。
 
-
 # Day 01
 
-* 介紹這幾天的活動
-* 國網機器的使用說明
-* 晚上 pizza 派對
-* 叢集競賽的經驗分享
+- 介紹這幾天的活動
+- 國網機器的使用說明
+- 晚上 pizza 派對
+- 叢集競賽的經驗分享
 
 # Day 02
 
-* Nvidia 演講，主要介紹最近的技術，並且有說官網上的 DLI Cource 可以把一堂付費課程領走
-* CUDA Programming，這個建議專心聽，有問題就發問，老師會回答得很清楚
-* 晚上可以選擇做 CUDA Lab 或是聽 advanced CUDA，大概是教 shared memory (tiling) 和其他 memory access 優化的技巧
+- Nvidia 演講，主要介紹最近的技術，並且有說官網上的 DLI Cource 可以把一堂付費課程領走
+- CUDA Programming，這個建議專心聽，有問題就發問，老師會回答得很清楚
+- 晚上可以選擇做 CUDA Lab 或是聽 advanced CUDA，大概是教 shared memory (tiling) 和其他 memory access 優化的技巧
 
 # Day 03
 
-* 效能評估，使用 Intel Vtune 分析 cpu 程式執行的效能，會告訴你瓶頸在哪
-* 效能競賽啟動，根據 HPL benchmark 跑到更高的 GFlops
+- 效能評估，使用 Intel Vtune 分析 cpu 程式執行的效能，會告訴你瓶頸在哪
+- 效能競賽啟動，根據 HPL benchmark 跑到更高的 GFlops
 
 # Day 04
 
-* 早上快速介紹一下 AI 的知識和科學計算的東西
-* 下午開始宣布競賽題目，直接炸開
-* 晚上燈都亮的，大家都很努力完成競賽專題，大概忙到快 4 點才睡覺
-
+- 早上快速介紹一下 AI 的知識和科學計算的東西
+- 下午開始宣布競賽題目，直接炸開
+- 晚上燈都亮的，大家都很努力完成競賽專題，大概忙到快 4 點才睡覺
 
 # Day 05
 
-
 搭遊覽車去國網中心，有看到超級電腦的實景（雖然只能用肉眼，不能拍），並且導覽也有說明，並且用虛擬導覽的方式展示新的 AI 超級電腦中心。最後是聽到睡著的 AI 簡報。
-
 
 在分享個人競賽的時候，前幾名大部分人都是使用 AI 完成，甚至 CUDA 助教也表示自己也寫不出這麼快的。話雖如此，AI 的使用也是相當重要的課題，很久以前就已經提倡過 Prompt Enginneering 的重要性了，但其中一位參賽者也分享 Context 也是相當重要，他的工作流大概是
 

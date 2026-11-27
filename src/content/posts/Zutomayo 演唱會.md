@@ -1,14 +1,14 @@
 ---
+
 title: Zutomayo INTENSE II「坐・ZOMBIE CRAB LABO」
 published: 2026-05-18
 description: ''
 image: 'ztmy_intense.jpg'
 tags: [Misc]
 category: ''
-draft: false 
+draft: false
 lang: ''
 ---
-
 
 # Introduction
 
@@ -45,12 +45,12 @@ lang: ''
 3. 低血ボルト
 4. 殘機
 5. シェードの埃は延長
-MC
+   MC
 6. 蟹しゃぶふぁんく
 7. 奥底眠りルーツ
 8. クリームで会いに行けますか
 9. 彷徨う酔い温度 （互動）
-MC
+   MC
 10. 日替 - 不法入侵
 11. よもすがら
 12. 秒針を噛む （Short Ver.）
@@ -61,11 +61,11 @@ MC
 17. またね幻（80光年先の君へ Ver.）
 18. マイノリティー脈絡 （合唱）
 19. あいつら全員同窓会
-MC
+    MC
 20. 間人間
 21. 正義
 22. 脳裏上のクラッカー (Member Introduction)
-MC
+    MC
 23. メディアノーチェ （合唱）
 
 # Concert Tour
@@ -85,7 +85,6 @@ MC
 ACAね 幾乎是靠實力把一切都撐起來，甚至把一些本來可能會讓人分心的地方全部救回來。她的聲音跟串流完全不是同一個體驗。Spotify 裡的版本當然很好，但現場的衝擊感、呼吸感和爆發力差太多了。聽完現場之後，再回去聽串流版本真的會有一種「怎麼少了什麼」的感覺。
 
 據說 Day2 的樂手們都很投入，吉他手是佐佐木貴之 [@kojiro_guitar](https://twitter.com/kojiro_guitar)，背彈兩次超帥的啦，現場看到真的會忍不住在心裡大叫。貝斯手二家本也是老熟了，整個人超穩，存在感很強。然後我還肉眼見識到扇風琴，真的好大一把，而且還會發光。以前只在影片或照片裡看過，實際看到會覺得那東西怎麼可以又荒謬又帥。
-
 
 ![Source](../../assets/images/ZTMY/Electric_Fan_Harp.jpg)
 

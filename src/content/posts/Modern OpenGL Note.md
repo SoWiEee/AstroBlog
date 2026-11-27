@@ -1,4 +1,5 @@
 ---
+
 title: Modern OpenGL Beginner Guide
 published: 2025-11-17
 description: ""

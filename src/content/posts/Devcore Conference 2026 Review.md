@@ -1,11 +1,12 @@
 ---
+
 title: Devcore Conference 2026 Review
 published: 2026-03-28
 description: ''
 image: ''
 tags: [InfoSec]
 category: 'Note'
-draft: false 
+draft: false
 lang: ''
 ---
 
@@ -37,8 +38,8 @@ lang: ''
 - 資源耗損作戰
 - 增加垃圾代碼
 - 從流程上做偵測 (storyline)
-    - group 是一組 processes 的集合，是追蹤和偵測的基本單位
-    - 威脅實際上是一個 group 
+  - group 是一組 processes 的集合，是追蹤和偵測的基本單位
+  - 威脅實際上是一個 group
 
 ## Turning Browser Features into Exploits
 
@@ -48,10 +49,9 @@ lang: ''
 
 ## Playing Cat and Mouse with WAF: the React2Shell Vercel CTF
 
- - Vercel 為了緩解 React 大洞而開的 bug bounty，一個洞 $5000
- - 感覺像在打網站漏洞，是 "exploit -> patch" 的循環
+- Vercel 為了緩解 React 大洞而開的 bug bounty，一個洞 $5000
+- 感覺像在打網站漏洞，是 "exploit -> patch" 的循環
 
 # Afterword
 
 太酷了看到一堆不同年齡層的人，第一場提到目前企業引入 AI/RAG 等等的元件本身有可能被利用，但也不能忽視網站本身的漏洞。也知道 WiFi 協議的規範，但怎麼實作也是很重要的工程。總之收穫了很多觀念和攻擊思維，往後再打比賽或看漏洞可能也會用到。
-
